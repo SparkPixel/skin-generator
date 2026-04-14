@@ -1,0 +1,5 @@
+variants/
+*.log
+.DS_Store
+__pycache__/
+test_preview/

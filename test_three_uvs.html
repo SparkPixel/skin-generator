@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <script>
+        const geo = new THREE.BoxGeometry(1, 1, 1);
+        const pos = geo.attributes.position;
+        const uv = geo.attributes.uv;
+        
+        const faces = ['+X', '-X', '+Y', '-Y', '+Z', '-Z'];
+        
+        for (let f = 0; f < 6; f++) {
+            console.log("Face " + f + " (" + faces[f] + "):");
+            for (let i = 0; i < 4; i++) {
+                const idx = f * 4 + i;
+                console.log("  v" + i + ": pos=[" + pos.getX(idx) + ", " + pos.getY(idx) + ", " + pos.getZ(idx) + "], uv=[" + uv.getX(idx) + ", " + uv.getY(idx) + "]");
+            }
+        }
+    </script>
+</body>
+</html>

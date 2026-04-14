@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SparkPixel Skin Generator</title>
+  <meta name="description" content="Customize and preview unique Minecraft skins with SparkPixel Skin Generator">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary: #0c0c18;
+      --bg-secondary: #111122;
+      --bg-card: rgba(16,16,32,0.85);
+      --bg-card-hover: rgba(24,24,48,0.9);
+      --border: rgba(90,172,64,0.15);
+      --border-hover: rgba(90,172,64,0.35);
+      --text-primary: #e8e8f0;
+      --text-secondary: #8a8aaa;
+      --text-dim: #555570;
+      --accent: #5aac40;
+      --accent-glow: rgba(90,172,64,0.3);
+      --accent2: #a855f7;
+      --accent2-glow: rgba(168,85,247,0.25);
+      --mc-green: #5aac40;
+      --mc-green-dark: #3d7a2a;
+      --mc-green-bright: #7fef3f;
+      --mc-purple: #a855f7;
+      --mc-cyan: #5ff0f0;
+      --mc-gold: #d4a843;
+      --mc-stone: #7a7a7a;
+      --mc-stone-dark: #4a4a4a;
+      --success: #5aac40;
+      --radius: 4px;
+      --radius-sm: 3px;
+      --radius-xs: 2px;
+      --font-pixel: 'Press Start 2P', monospace;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--mc-green-dark); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--mc-green); }
+
+    /* Vignette overlay over particle canvas */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(90,172,64,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(168,85,247,0.04) 0%, transparent 50%),
+        radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Particle canvas background */
+    #bgCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .app {
+      position: relative;
+      z-index: 2;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      text-align: center;
+      padding: 32px 0 28px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--mc-green), var(--mc-cyan));
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 20px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.2);
+      image-rendering: pixelated;
+    }
+
+    .logo-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    h1 {
+      font-family: var(--font-pixel);
+      font-size: 1.4rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      background: linear-gradient(90deg, var(--mc-green-bright), var(--mc-cyan), var(--mc-purple), var(--mc-green-bright));
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: enchant-shimmer 4s linear infinite;
+    }
+
+    @keyframes enchant-shimmer {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+
+    .header-subtitle {
+      color: var(--mc-gold);
+      font-family: var(--font-pixel);
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      margin-top: 8px;
+      text-transform: uppercase;
+    }
+
+    .version-badge {
+      display: inline-block;
+      font-family: var(--font-pixel);
+      font-size: 0.45rem;
+      background: var(--mc-green);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 2px;
+      margin-left: 8px;
+      vertical-align: middle;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    .header-separator {
+      height: 3px;
+      margin: 20px auto 0;
+      max-width: 500px;
+      background: linear-gradient(90deg, transparent, var(--mc-green), var(--mc-cyan), var(--mc-purple), transparent);
+      image-rendering: pixelated;
+      opacity: 0.6;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    @media (max-width: 840px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      .preview-section { order: -1; }
+    }
+
+    /* ── PREVIEW ── */
+    .preview-section {
+      position: sticky;
+      top: 24px;
+    }
+
+    .preview-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      backdrop-filter: blur(12px);
+      transition: box-shadow 0.4s ease;
+      position: relative;
+    }
+    .preview-card:hover {
+      box-shadow: 0 0 30px rgba(90,172,64,0.08);
+    }
+
+    .viewer-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3/4;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: linear-gradient(180deg, #0a0a2e 0%, #12082e 60%, #1a0a3e 100%);
+      box-shadow: inset 0 2px 12px rgba(0,0,0,0.6);
+      cursor: grab;
+    }
+    .viewer-container:active { cursor: grabbing; }
+
+    /* Twinkling stars in viewer */
+    .viewer-stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .viewer-star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: #fff;
+      border-radius: 0;
+      animation: twinkle var(--dur, 3s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+      opacity: 0.4;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 0.8; }
+    }
+
+    .viewer-container canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      outline: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .viewer-hint {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-pixel);
+      font-size: 0.4rem;
+      color: var(--mc-gold);
+      background: rgba(0,0,0,0.75);
+      padding: 4px 10px;
+      border: 1px solid rgba(212,168,67,0.3);
+      pointer-events: none;
+      transition: opacity 0.5s;
+      z-index: 2;
+      white-space: nowrap;
+    }
+
+    .viewer-coords {
+      position: absolute;
+      top: 6px;
+      left: 8px;
+      font-family: var(--font-pixel);
+      font-size: 0.35rem;
+      color: rgba(255,255,255,0.3);
+      pointer-events: none;
+      z-index: 2;
+      line-height: 1.8;
+    }
+
+    /* Minecraft chat-style skin name */
+    .skin-name-display {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.5rem;
+      color: #ccc;
+      margin-top: 10px;
+      word-break: break-all;
+      font-family: var(--font-pixel);
+      padding: 6px 10px;
+      background: rgba(0,0,0,0.65);
+      border-radius: var(--radius-xs);
+      line-height: 1.6;
+    }
+    .skin-name-prefix {
+      color: var(--mc-green-bright);
+      flex-shrink: 0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    /* Minecraft-style buttons */
+    .btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-pixel);
+      font-size: 0.55rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+      image-rendering: pixelated;
+    }
+
+    .btn-primary {
+      background: var(--mc-green);
+      color: #fff;
+      border-top: 2px solid #7fcc5a;
+      border-left: 2px solid #6fbc4a;
+      border-bottom: 3px solid var(--mc-green-dark);
+      border-right: 3px solid var(--mc-green-dark);
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+    .btn-primary:hover {
+      background: #6fc455;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px var(--accent-glow);
+    }
+    .btn-primary:active {
+      transform: translateY(1px);
+      border-top: 3px solid var(--mc-green-dark);
+      border-bottom: 2px solid #7fcc5a;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      background: var(--mc-stone-dark);
+      color: #ccc;
+      border-top: 2px solid var(--mc-stone);
+      border-left: 2px solid #666;
+      border-bottom: 3px solid #333;
+      border-right: 3px solid #333;
+    }
+    .btn-secondary:hover {
+      background: #555;
+      color: var(--text-primary);
+    }
+    .btn-secondary:active {
+      transform: translateY(1px);
+      border-top: 3px solid #333;
+      border-bottom: 2px solid var(--mc-stone);
+    }
+
+    /* ── OPTIONS ── */
+    .options-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-group {
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .option-group::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--mc-green), var(--mc-cyan), var(--mc-purple));
+      opacity: 0.5;
+    }
+    .option-group:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .option-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .option-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 3px;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+    }
+
+    .option-title {
+      font-family: var(--font-pixel);
+      font-size: 0.55rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+
+    .option-count {
+      margin-left: auto;
+      font-family: var(--font-pixel);
+      font-size: 0.4rem;
+      color: var(--text-dim);
+    }
+
+    .option-chevron {
+      color: var(--text-dim);
+      font-size: 0.6rem;
+      transition: transform 0.3s ease;
+      margin-left: 6px;
+    }
+    .option-group.collapsed .option-chevron {
+      transform: rotate(-90deg);
+    }
+    .option-group.collapsed .option-grid {
+      display: none;
+    }
+
+    .option-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .opt-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px 5px 6px;
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .opt-btn:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.15);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+
+    .opt-btn.active {
+      background: rgba(90,172,64,0.12);
+      border-color: var(--mc-green);
+      color: #fff;
+      box-shadow: 0 0 12px var(--accent-glow);
+      animation: active-pulse 2s ease-in-out infinite;
+    }
+    @keyframes active-pulse {
+      0%, 100% { box-shadow: 0 0 8px var(--accent-glow); }
+      50% { box-shadow: 0 0 16px var(--accent-glow); }
+    }
+
+    .opt-swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      border: 1.5px solid rgba(255,255,255,0.15);
+    }
+
+    .opt-btn.active .opt-swatch {
+      border-color: rgba(255,255,255,0.5);
+      box-shadow: 0 0 6px rgba(255,255,255,0.2);
+    }
+
+    /* Eye swatches show two colors */
+    .opt-swatch-eye {
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      overflow: hidden;
+      position: relative;
+    }
+    .opt-swatch-eye::before,
+    .opt-swatch-eye::after {
+      content: '';
+      position: absolute;
+      top: 0; width: 50%; height: 100%;
+    }
+    .opt-swatch-eye::before { left: 0; }
+    .opt-swatch-eye::after { right: 0; }
+
+    /* ── LOADING ── */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      display: grid;
+      place-items: center;
+      z-index: 100;
+      transition: opacity 0.5s ease;
+    }
+    .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+
+    .loading-content {
+      text-align: center;
+    }
+    .loading-logo {
+      font-family: var(--font-pixel);
+      font-size: 1rem;
+      color: var(--mc-green-bright);
+      margin-bottom: 24px;
+      text-shadow: 0 0 20px var(--accent-glow);
+    }
+    .loading-bar-track {
+      width: 280px;
+      height: 14px;
+      background: #222;
+      border: 2px solid #444;
+      border-radius: 2px;
+      margin: 0 auto 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    .loading-bar-fill {
+      height: 100%;
+      background: var(--mc-green);
+      width: 0%;
+      transition: width 0.3s ease;
+      box-shadow: inset 0 -2px 0 var(--mc-green-dark), inset 0 2px 0 #7fcc5a;
+      position: relative;
+    }
+    .loading-bar-fill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 12px,
+        rgba(0,0,0,0.15) 12px,
+        rgba(0,0,0,0.15) 14px
+      );
+    }
+    .loading-text {
+      font-family: var(--font-pixel);
+      color: var(--text-secondary);
+      font-size: 0.45rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      text-align: center;
+      padding: 32px 0 16px;
+      margin-top: 20px;
+      position: relative;
+    }
+    .footer-separator {
+      height: 2px;
+      max-width: 400px;
+      margin: 0 auto 20px;
+      background: linear-gradient(90deg, transparent, var(--mc-green), var(--mc-cyan), var(--mc-purple), transparent);
+      opacity: 0.4;
+    }
+    .footer-text {
+      font-family: var(--font-pixel);
+      font-size: 0.4rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+    .footer-pickaxe {
+      display: inline-block;
+      margin: 0 8px;
+      font-size: 0.7rem;
+      opacity: 0.5;
+    }
+
+    /* ── TRANSITION ── */
+    .preview-view canvas {
+      transition: box-shadow 0.3s ease;
+    }
+    .preview-view canvas.flash {
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.3), 0 0 20px var(--accent-glow);
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-content">
+    <div class="loading-logo">SPARKPIXEL</div>
+    <div class="loading-bar-track">
+      <div class="loading-bar-fill" id="loadingBar"></div>
+    </div>
+    <div class="loading-text">Loading skin data...</div>
+  </div>
+</div>
+
+<div class="app">
+
+  <header>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+          <rect x="7" y="1" width="2" height="2" fill="#fff"/>
+          <rect x="5" y="3" width="2" height="2" fill="#aef"/>
+          <rect x="9" y="3" width="2" height="2" fill="#aef"/>
+          <rect x="7" y="3" width="2" height="2" fill="#fff"/>
+          <rect x="3" y="5" width="2" height="2" fill="#7fef3f"/>
+          <rect x="5" y="5" width="2" height="2" fill="#aef"/>
+          <rect x="7" y="5" width="2" height="2" fill="#fff"/>
+          <rect x="9" y="5" width="2" height="2" fill="#aef"/>
+          <rect x="11" y="5" width="2" height="2" fill="#7fef3f"/>
+          <rect x="5" y="7" width="2" height="2" fill="#7fef3f"/>
+          <rect x="7" y="7" width="2" height="2" fill="#aef"/>
+          <rect x="9" y="7" width="2" height="2" fill="#7fef3f"/>
+          <rect x="7" y="9" width="2" height="2" fill="#5aac40"/>
+          <rect x="5" y="11" width="2" height="2" fill="#3d7a2a"/>
+          <rect x="7" y="11" width="2" height="2" fill="#5aac40"/>
+          <rect x="9" y="11" width="2" height="2" fill="#3d7a2a"/>
+          <rect x="7" y="13" width="2" height="2" fill="#3d7a2a"/>
+        </svg>
+      </div>
+      <h1>SPARKPIXEL</h1>
+    </div>
+    <div class="header-subtitle">Skin Generator <span class="version-badge">v2.0</span></div>
+    <div class="header-separator"></div>
+  </header>
+
+  <div class="main-grid">
+    <!-- Preview Column -->
+    <div class="preview-section">
+      <div class="preview-card">
+        <div class="viewer-container" id="viewerContainer">
+          <div class="viewer-stars" id="viewerStars"></div>
+          <div class="viewer-coords" id="viewerCoords">XYZ: 0.0 / 72.0 / 0.0<br>Biome: Plains</div>
+          <div class="viewer-hint" id="viewerHint">Drag to rotate</div>
+        </div>
+        <div class="skin-name-display" id="skinName"><span class="skin-name-prefix">&gt;</span> original</div>
+        <div class="actions">
+          <button class="btn btn-primary" id="downloadBtn">⬇ Download</button>
+          <button class="btn btn-secondary" id="resetBtn">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Options Column -->
+    <div class="options-section" id="optionsContainer"></div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-separator"></div>
+    <div class="footer-text">
+      <span class="footer-pickaxe">⛏</span> SparkPixel © 2026 <span class="footer-pickaxe">⛏</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// DATA — matches generate_variants.py exactly
+// ══════════════════════════════════════════════
+
+const SUIT_COLORS = [
+  ["black_suit", 0.0, 0.0, 1.0],
+  ["charcoal_suit", 0.0, 0.0, 1.2],
+  ["grey_suit", 0.0, 0.0, 1.5],
+  ["light_grey_suit", 0.0, 0.0, 1.8],
+  ["navy_suit", 0.62, 0.65, 1.0],
+  ["royal_blue_suit", 0.60, 0.70, 1.1],
+  ["midnight_suit", 0.65, 0.55, 0.85],
+  ["burgundy_suit", 0.97, 0.65, 1.0],
+  ["wine_suit", 0.95, 0.55, 0.95],
+  ["crimson_suit", 0.0, 0.60, 1.05],
+  ["forest_suit", 0.38, 0.55, 1.0],
+  ["emerald_suit", 0.42, 0.65, 1.1],
+  ["olive_suit", 0.22, 0.45, 1.05],
+  ["purple_suit", 0.78, 0.60, 1.0],
+  ["plum_suit", 0.83, 0.45, 1.0],
+  ["teal_suit", 0.50, 0.55, 1.0],
+  ["brown_suit", 0.07, 0.50, 1.0],
+  ["tan_suit", 0.10, 0.30, 1.4],
+  ["cream_suit", 0.12, 0.15, 2.0],
+  ["white_suit", 0.12, 0.08, 2.2],
+  ["rust_suit", 0.04, 0.65, 1.0],
+  ["copper_suit", 0.05, 0.60, 1.2],
+];
+
+const TIE_COLORS = [
+  ["red_tie", 0.0, 0.75, 1.0],
+  ["burgundy_tie", 0.97, 0.60, 0.8],
+  ["blue_tie", 0.60, 0.70, 1.0],
+  ["navy_tie", 0.63, 0.65, 0.8],
+  ["green_tie", 0.38, 0.65, 1.0],
+  ["gold_tie", 0.13, 0.75, 1.0],
+  ["orange_tie", 0.08, 0.75, 1.0],
+  ["purple_tie", 0.78, 0.65, 1.0],
+  ["pink_tie", 0.93, 0.50, 1.0],
+  ["teal_tie", 0.48, 0.65, 1.0],
+  ["cyan_tie", 0.52, 0.70, 1.0],
+  ["silver_tie", 0.0, 0.05, 1.0],
+  ["black_tie", 0.0, 0.0, 0.25],
+  ["white_tie", 0.12, 0.08, 1.4],
+  ["yellow_tie", 0.16, 0.75, 1.2],
+  ["coral_tie", 0.02, 0.55, 1.0],
+];
+
+const HAIR_COLORS = [
+  ["black_hair", 0.0, 0.0, 1.0],
+  ["dark_brown_hair", 0.06, 0.40, 1.1],
+  ["brown_hair", 0.07, 0.45, 1.3],
+  ["blonde_hair", 0.12, 0.55, 2.5],
+  ["platinum_hair", 0.14, 0.15, 4.0],
+  ["ginger_hair", 0.05, 0.70, 1.6],
+  ["auburn_hair", 0.03, 0.60, 1.5],
+  ["silver_hair", 0.0, 0.0, 4.0],
+  ["white_hair", 0.0, 0.0, 5.5],
+  ["blue_hair", 0.58, 0.80, 1.8],
+  ["purple_hair", 0.78, 0.55, 1.2],
+  ["pink_hair", 0.92, 0.65, 1.6],
+  ["green_hair", 0.42, 0.60, 1.5],
+  ["teal_hair", 0.50, 0.60, 1.5],
+  ["red_hair", 0.0, 0.55, 1.2],
+  ["orange_hair", 0.08, 0.70, 1.7],
+];
+
+const EYE_COLORS = [
+  ["dark_eyes", [20,20,20], [10,10,10]],
+  ["brown_eyes", [100,60,30], [60,35,15]],
+  ["green_eyes", [50,140,60], [30,100,40]],
+  ["blue_eyes", [40,80,180], [20,50,140]],
+  ["light_blue_eyes", [80,140,220], [50,100,180]],
+  ["amber_eyes", [180,140,30], [140,100,10]],
+  ["grey_eyes", [120,125,130], [80,85,90]],
+  ["violet_eyes", [120,50,180], [80,30,140]],
+  ["red_eyes", [180,20,20], [140,10,10]],
+  ["cyan_eyes", [40,180,200], [20,140,160]],
+];
+
+const SPARK_COLORS = [
+  ["gold_spark", 0.13, 0.75, 1.0],
+  ["red_spark", 0.0, 0.70, 1.0],
+  ["orange_spark", 0.08, 0.70, 1.0],
+  ["green_spark", 0.38, 0.65, 1.0],
+  ["cyan_spark", 0.52, 0.75, 1.0],
+  ["blue_spark", 0.60, 0.70, 1.0],
+  ["purple_spark", 0.78, 0.65, 1.0],
+  ["pink_spark", 0.93, 0.55, 1.0],
+];
+
+const CROWN_COLORS = [
+  ["gold_crown", 0.13, 0.75, 1.0],
+  ["red_crown", 0.0, 0.70, 1.0],
+  ["orange_crown", 0.08, 0.70, 1.0],
+  ["green_crown", 0.38, 0.65, 1.0],
+  ["cyan_crown", 0.52, 0.75, 1.0],
+  ["blue_crown", 0.60, 0.70, 1.0],
+  ["purple_crown", 0.78, 0.65, 1.0],
+  ["pink_crown", 0.93, 0.55, 1.0],
+];
+
+// ══════════════════════════════════════════════
+// TEXTURE REGIONS (x1, y1, x2, y2)
+// ══════════════════════════════════════════════
+
+const REGIONS = {
+  head_top:[8,0,16,8], head_front:[8,8,16,16], head_right:[0,8,8,16],
+  head_left:[16,8,24,16], head_back:[24,8,32,16], head_bottom:[16,0,24,8],
+  body_front:[20,20,28,32], body_back:[32,20,40,32],
+  body_right:[16,20,20,32], body_left:[28,20,32,32],
+  body_top:[20,16,28,20], body_bottom:[28,16,36,20],
+  right_arm_front:[44,20,47,32], right_arm_back:[51,20,54,32],
+  right_arm_outer:[40,20,44,32], right_arm_inner:[47,20,51,32],
+  right_arm_top:[44,16,47,20], right_arm_bottom:[47,16,50,20],
+  left_arm_front:[36,52,39,64], left_arm_back:[43,52,46,64],
+  left_arm_outer:[32,52,36,64], left_arm_inner:[39,52,43,64],
+  left_arm_top:[36,48,39,52], left_arm_bottom:[39,48,42,52],
+  right_leg_front:[4,20,8,32], right_leg_back:[12,20,16,32],
+  right_leg_outer:[0,20,4,32], right_leg_inner:[8,20,12,32],
+  right_leg_top:[4,16,8,20], right_leg_bottom:[8,16,12,20],
+  left_leg_front:[20,52,24,64], left_leg_back:[28,52,32,64],
+  left_leg_outer:[16,52,20,64], left_leg_inner:[24,52,28,64],
+  left_leg_top:[20,48,24,52], left_leg_bottom:[24,48,28,52],
+  head_overlay_top:[40,0,48,8], head_overlay_front:[40,8,48,16],
+  head_overlay_right:[32,8,40,16], head_overlay_left:[48,8,56,16],
+  head_overlay_back:[56,8,64,16], head_overlay_bottom:[48,0,56,8],
+  body_overlay_front:[20,36,28,48], body_overlay_back:[32,36,40,48],
+  body_overlay_right:[16,36,20,48], body_overlay_left:[28,36,32,48],
+  body_overlay_top:[20,32,28,36], body_overlay_bottom:[28,32,36,36],
+  right_arm_overlay_front:[44,36,47,48], right_arm_overlay_back:[51,36,54,48],
+  right_arm_overlay_outer:[40,36,44,48], right_arm_overlay_inner:[47,36,51,48],
+  right_arm_overlay_top:[44,32,47,36], right_arm_overlay_bottom:[47,32,50,36],
+  left_arm_overlay_front:[52,52,55,64], left_arm_overlay_back:[59,52,62,64],
+  left_arm_overlay_outer:[48,52,52,64], left_arm_overlay_inner:[55,52,59,64],
+  left_arm_overlay_top:[52,48,55,52], left_arm_overlay_bottom:[55,48,58,52],
+  right_leg_overlay_front:[4,36,8,48], right_leg_overlay_back:[12,36,16,48],
+  right_leg_overlay_outer:[0,36,4,48], right_leg_overlay_inner:[8,36,12,48],
+  right_leg_overlay_top:[4,32,8,36], right_leg_overlay_bottom:[8,32,12,36],
+  left_leg_overlay_front:[4,52,8,64], left_leg_overlay_back:[12,52,16,64],
+  left_leg_overlay_outer:[0,52,4,64], left_leg_overlay_inner:[8,52,12,64],
+  left_leg_overlay_top:[4,48,8,52], left_leg_overlay_bottom:[8,48,12,52],
+};
+
+// ══════════════════════════════════════════════
+// COLOR MATH
+// ══════════════════════════════════════════════
+
+function hsvToRgb(h, s, v) {
+  let i = Math.floor(h * 6) % 6, f = h * 6 - Math.floor(h * 6);
+  let p = v * (1 - s), q = v * (1 - s * f), t = v * (1 - s * (1 - f));
+  let r, g, b;
+  switch (i) {
+    case 0: r=v; g=t; b=p; break;
+    case 1: r=q; g=v; b=p; break;
+    case 2: r=p; g=v; b=t; break;
+    case 3: r=p; g=q; b=v; break;
+    case 4: r=t; g=p; b=v; break;
+    default: r=v; g=p; b=q;
+  }
+  return [r, g, b];
+}
+
+function rgbToHsv(r, g, b) {
+  let mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+  let d = mx - mn, h = 0, s = mx > 0 ? d / mx : 0, v = mx;
+  if (d > 0) {
+    if (mx === r) h = ((g - b) / d) % 6;
+    else if (mx === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h = ((h / 6) % 1 + 1) % 1;
+  }
+  return [h, s, v];
+}
+
+// ══════════════════════════════════════════════
+// SKIN ENGINE
+// ══════════════════════════════════════════════
+
+let baseImageData = null; // Uint8ClampedArray of the original (unified) 64x64 RGBA
+let masks = {}; // { suit: [{y,x,baseV}], tie: [...], hair: [...], accent: [...] }
+let currentSelection = { suit: 0, tie: 0, hair: 0, eyes: 0, spark: 0, crown: 0 };
+
+function buildRegionMask(regionNames) {
+  const m = new Uint8Array(64 * 64);
+  for (const name of regionNames) {
+    if (!REGIONS[name]) continue;
+    const [x1, y1, x2, y2] = REGIONS[name];
+    for (let y = y1; y < y2; y++)
+      for (let x = x1; x < x2; x++)
+        m[y * 64 + x] = 1;
+  }
+  return m;
+}
+
+function classifyAndBuildMasks(data) {
+  const W = 64, H = 64;
+
+  // Build region masks
+  const suitBaseKeys = Object.keys(REGIONS).filter(k => (k.includes('body') || k.includes('arm') || k.includes('leg')) && !k.includes('overlay'));
+  const suitOverlayKeys = Object.keys(REGIONS).filter(k => (k.includes('body') || k.includes('arm') || k.includes('leg')) && k.includes('overlay'));
+  const headKeys = Object.keys(REGIONS).filter(k => k.startsWith('head'));
+  const headBaseKeys = Object.keys(REGIONS).filter(k => k.startsWith('head') && !k.includes('overlay'));
+  const headOverlayKeys = Object.keys(REGIONS).filter(k => k.startsWith('head_overlay'));
+
+  const suitBaseRegion = buildRegionMask(suitBaseKeys);
+  const suitOverlayRegion = buildRegionMask(suitOverlayKeys);
+  const headRegion = buildRegionMask(headKeys);
+  const headBaseRegion = buildRegionMask(headBaseKeys);
+  const headOverlayRegion = buildRegionMask(headOverlayKeys);
+
+  const suitPixels = [], tiePixels = [], hairPixels = [], sparkPixels = [], crownPixels = [];
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4;
+      const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3];
+      if (a === 0) continue;
+
+      const ri = r, gi = g, bi = b;
+      const isGrey = Math.abs(ri - gi) <= 5 && Math.abs(gi - bi) <= 5 && Math.abs(ri - bi) <= 5;
+      const brightness = (ri + gi + bi) / 3;
+      const notGrey = !isGrey;
+
+      const isTie = r > 140 && g < 80 && b < 80 && notGrey;
+      const isGold = notGrey && r > 140 && g > 80 && (gi - bi > 50) && !isTie;
+      const isCyan = notGrey && b > 140 && r < 80 && g > 100;
+      const isSuitLight = isGrey && brightness >= 60 && brightness < 180;
+      const isSuitDark = isGrey && brightness < 60;
+      const isSuit = isSuitDark || isSuitLight;
+      const isShirt = isGrey && brightness >= 180;
+
+      const idx = y * W + x;
+      const inSuitBase = suitBaseRegion[idx];
+      const inSuitOverlay = suitOverlayRegion[idx];
+      const inHeadBase = headBaseRegion[idx];
+      const inHeadOverlay = headOverlayRegion[idx];
+
+      // Base value for HSV transforms
+      const baseV = Math.max(r, g, b) / 255;
+
+      if (isSuit && (inSuitBase || inSuitOverlay)) {
+        suitPixels.push({ y, x, baseV });
+      }
+      if (isTie && (inSuitBase || inSuitOverlay)) {
+        tiePixels.push({ y, x, baseV });
+      }
+      // Bounding box for the white mask's dark eyes/features so they don't get colored as hair
+      const inMaskBox = (x >= 44 && x <= 47 && y >= 8 && y <= 15);
+      
+      // Hair includes base head layer, plus head overlay (sideburns, bands) except for the mask box
+      if (isSuit && (inHeadBase || (inHeadOverlay && !inMaskBox))) {
+        hairPixels.push({ y, x, baseV });
+      }
+      if ((isGold || isCyan || (isTie && inHeadOverlay)) && (inHeadOverlay || inSuitBase || inSuitOverlay)) {
+        if (inHeadOverlay) {
+          crownPixels.push({ y, x, baseV });
+        } else {
+          sparkPixels.push({ y, x, baseV });
+        }
+      }
+    }
+  }
+
+  masks = {
+    suit: suitPixels,
+    tie: tiePixels,
+    hair: hairPixels,
+    spark: sparkPixels,
+    crown: crownPixels
+  };
+}
+
+function applyTransforms(srcData) {
+  const out = new Uint8ClampedArray(srcData);
+  const W = 64;
+
+  // Get current options
+  const sOpt = SUIT_COLORS[currentSelection.suit];
+  const tOpt = TIE_COLORS[currentSelection.tie];
+  const hOpt = HAIR_COLORS[currentSelection.hair];
+  const eOpt = EYE_COLORS[currentSelection.eyes];
+  const spOpt = SPARK_COLORS[currentSelection.spark];
+  const crOpt = CROWN_COLORS[currentSelection.crown];
+
+  // Apply suit
+  for (const p of masks.suit) {
+    const v = Math.min(1, p.baseV * sOpt[3]);
+    const satFactor = Math.max(0, Math.min(1, 1.0 - Math.pow(p.baseV * 2.0, 4)));
+    const [r, g, b] = hsvToRgb(sOpt[1], sOpt[2] * satFactor, v);
+    const i = (p.y * W + p.x) * 4;
+    out[i] = Math.round(r * 255);
+    out[i+1] = Math.round(g * 255);
+    out[i+2] = Math.round(b * 255);
+  }
+
+  // Apply tie (use base brightness from original)
+  for (const p of masks.tie) {
+    const origI = (p.y * W + p.x) * 4;
+    const or = srcData[origI]/255, og = srcData[origI+1]/255, ob = srcData[origI+2]/255;
+    const [oh, os, ov] = rgbToHsv(or, og, ob);
+    const [r, g, b] = hsvToRgb(tOpt[1], tOpt[2], Math.min(1.0, ov * tOpt[3]));
+    out[origI] = Math.round(r * 255);
+    out[origI+1] = Math.round(g * 255);
+    out[origI+2] = Math.round(b * 255);
+  }
+
+  // Apply hair
+  for (const p of masks.hair) {
+    const v = Math.min(1, p.baseV * hOpt[3]);
+    const satFactor = Math.max(0, Math.min(1, 1.0 - Math.pow(p.baseV * 2.0, 4)));
+    const [r, g, b] = hsvToRgb(hOpt[1], hOpt[2] * satFactor, v);
+    const i = (p.y * W + p.x) * 4;
+    out[i] = Math.round(r * 255);
+    out[i+1] = Math.round(g * 255);
+    out[i+2] = Math.round(b * 255);
+  }
+
+  // Apply eyes
+  const eyeMain = eOpt[1], eyeDark = eOpt[2];
+  const eyeMainCoords = [[11,12],[13,12],[11,13],[13,13]];
+  const eyeDarkCoords = [[10,12],[14,12],[10,13],[14,13]];
+  for (const [x, y] of eyeMainCoords) {
+    const i = (y * W + x) * 4;
+    out[i] = eyeMain[0]; out[i+1] = eyeMain[1]; out[i+2] = eyeMain[2]; out[i+3] = 255;
+  }
+  for (const [x, y] of eyeDarkCoords) {
+    const i = (y * W + x) * 4;
+    out[i] = eyeDark[0]; out[i+1] = eyeDark[1]; out[i+2] = eyeDark[2]; out[i+3] = 255;
+  }
+
+  // Apply spark
+  for (const p of masks.spark) {
+    const origI = (p.y * W + p.x) * 4;
+    const or = srcData[origI]/255, og = srcData[origI+1]/255, ob = srcData[origI+2]/255;
+    const [oh, os, ov] = rgbToHsv(or, og, ob);
+    const [r, g, b] = hsvToRgb(spOpt[1], spOpt[2], Math.min(1.0, ov * spOpt[3]));
+    out[origI] = Math.round(r * 255);
+    out[origI+1] = Math.round(g * 255);
+    out[origI+2] = Math.round(b * 255);
+  }
+
+  // Apply crown
+  for (const p of masks.crown) {
+    const origI = (p.y * W + p.x) * 4;
+    const or = srcData[origI]/255, og = srcData[origI+1]/255, ob = srcData[origI+2]/255;
+    const [oh, os, ov] = rgbToHsv(or, og, ob);
+    const [r, g, b] = hsvToRgb(crOpt[1], crOpt[2], Math.min(1.0, ov * crOpt[3]));
+    out[origI] = Math.round(r * 255);
+    out[origI+1] = Math.round(g * 255);
+    out[origI+2] = Math.round(b * 255);
+  }
+
+  return out;
+}
+
+// ══════════════════════════════════════════════
+// 3D VIEWER (Three.js)
+// ══════════════════════════════════════════════
+
+let scene, camera, renderer, controls, skinGroup;
+let textureCanvas, textureCtx, skinTexture;
+
+function initViewer() {
+  const container = document.getElementById('viewerContainer');
+  const w = container.clientWidth;
+  const h = container.clientHeight;
+
+  // Scene
+  scene = new THREE.Scene();
+
+  // Camera
+  camera = new THREE.PerspectiveCamera(35, w / h, 0.1, 1000);
+  camera.position.set(0, -2, 58);
+
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setClearColor(0x000000, 0);
+  container.insertBefore(renderer.domElement, container.firstChild);
+
+  // Controls
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enablePan = false;
+  controls.enableZoom = true;
+  controls.minDistance = 20;
+  controls.maxDistance = 100;
+  controls.target.set(0, -2, 0);
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 1.5;
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.update();
+
+  // Hide hint on interaction
+  const hint = document.getElementById('viewerHint');
+  controls.addEventListener('start', () => {
+    hint.style.opacity = '0';
+    controls.autoRotate = false;
+  });
+
+  // Lighting
+  const amb = new THREE.AmbientLight(0xffffff, 0.75);
+  scene.add(amb);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.55);
+  dir.position.set(5, 10, 8);
+  scene.add(dir);
+  const fill = new THREE.DirectionalLight(0xaabbff, 0.25);
+  fill.position.set(-5, -2, -5);
+  scene.add(fill);
+
+  // Ground shadow circle
+  const shadowGeo = new THREE.CircleGeometry(5, 32);
+  const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.18 });
+  const shadow = new THREE.Mesh(shadowGeo, shadowMat);
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = -10;
+  scene.add(shadow);
+
+  // Texture canvas (we'll paint transformed data here)
+  textureCanvas = document.createElement('canvas');
+  textureCanvas.width = 64;
+  textureCanvas.height = 64;
+  textureCtx = textureCanvas.getContext('2d');
+
+  skinTexture = new THREE.CanvasTexture(textureCanvas);
+  skinTexture.magFilter = THREE.NearestFilter;
+  skinTexture.minFilter = THREE.NearestFilter;
+  skinTexture.generateMipmaps = false;
+
+  // Build character
+  skinGroup = new THREE.Group();
+  buildCharacterModel();
+  scene.add(skinGroup);
+
+  // Resize handler
+  window.addEventListener('resize', () => {
+    const w2 = container.clientWidth;
+    const h2 = container.clientHeight;
+    camera.aspect = w2 / h2;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w2, h2);
+  });
+
+  // Render loop
+  (function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  })();
+}
+
+// Helper: set UV for a single face
+function setFaceUV(geo, faceIndex, x, y, w, h, texW, texH, flipY = false) {
+  const uv = geo.attributes.uv;
+  const i = faceIndex * 4;
+  let u0 = x / texW, v0 = 1 - y / texH;  // Top-Left of rect
+  let u1 = (x + w) / texW, v1 = 1 - (y + h) / texH; // Bottom-Right
+
+  if (flipY) {
+    uv.setXY(i + 0, u0, v1);
+    uv.setXY(i + 1, u1, v1);
+    uv.setXY(i + 2, u0, v0);
+    uv.setXY(i + 3, u1, v0);
+  } else {
+    uv.setXY(i + 0, u0, v0);
+    uv.setXY(i + 1, u1, v0);
+    uv.setXY(i + 2, u0, v1);
+    uv.setXY(i + 3, u1, v1);
+  }
+}
+
+function makeBodyPart(w, h, d, uvMap, isOverlay) {
+  const geo = new THREE.BoxGeometry(w, h, d);
+  // Three.js BoxGeometry face order: 0:+X, 1:-X, 2:+Y, 3:-Y, 4:+Z, 5:-Z
+  // Character faces +Z, so math +X = character's left, -X = character's right.
+  // Standard Minecraft mapping applies perfectly to all faces except the bottom (-Y)
+  // which requires a vertical (V) flip because its top/bottom visual edges in texture space
+  // are inverted relative to the top/bottom viewing edges in 3D space.
+  const T = 64;
+  setFaceUV(geo, 0, uvMap.left[0], uvMap.left[1], uvMap.left[2], uvMap.left[3], T, T);    // +X = char left
+  setFaceUV(geo, 1, uvMap.right[0], uvMap.right[1], uvMap.right[2], uvMap.right[3], T, T); // -X = char right
+  setFaceUV(geo, 2, uvMap.top[0], uvMap.top[1], uvMap.top[2], uvMap.top[3], T, T);        // +Y = top
+  setFaceUV(geo, 3, uvMap.bottom[0], uvMap.bottom[1], uvMap.bottom[2], uvMap.bottom[3], T, T, true); // -Y = bottom (V-flipped)
+  setFaceUV(geo, 4, uvMap.front[0], uvMap.front[1], uvMap.front[2], uvMap.front[3], T, T); // +Z = front
+  setFaceUV(geo, 5, uvMap.back[0], uvMap.back[1], uvMap.back[2], uvMap.back[3], T, T);    // -Z = back
+
+  const mat = new THREE.MeshLambertMaterial({
+    map: skinTexture,
+    transparent: isOverlay,
+    alphaTest: isOverlay ? 0.1 : 0,
+    side: isOverlay ? THREE.DoubleSide : THREE.FrontSide,
+  });
+
+  return new THREE.Mesh(geo, mat);
+}
+
+function buildCharacterModel() {
+  const S = 1; // scale: 1 unit = 1 pixel
+
+  // ── HEAD (8x8x8) ──
+  // Minecraft: right=[0,8], left=[16,8], top=[8,0], bottom=[16,0], front=[8,8], back=[24,8]
+  const head = makeBodyPart(8*S, 8*S, 8*S, {
+    right: [0, 8, 8, 8], left: [16, 8, 8, 8],
+    top: [8, 0, 8, 8], bottom: [16, 0, 8, 8],
+    front: [8, 8, 8, 8], back: [24, 8, 8, 8],
+  }, false);
+  head.position.set(0, 10*S, 0);
+  skinGroup.add(head);
+
+  const headOL = makeBodyPart(8.5*S, 8.5*S, 8.5*S, {
+    right: [32, 8, 8, 8], left: [48, 8, 8, 8],
+    top: [40, 0, 8, 8], bottom: [48, 0, 8, 8],
+    front: [40, 8, 8, 8], back: [56, 8, 8, 8],
+  }, true);
+  headOL.position.copy(head.position);
+  skinGroup.add(headOL);
+
+  // ── BODY (8x12x4) ──
+  // Minecraft: right=[16,20], left=[28,20], top=[20,16], bottom=[28,16], front=[20,20], back=[32,20]
+  const body = makeBodyPart(8*S, 12*S, 4*S, {
+    right: [16, 20, 4, 12], left: [28, 20, 4, 12],
+    top: [20, 16, 8, 4], bottom: [28, 16, 8, 4],
+    front: [20, 20, 8, 12], back: [32, 20, 8, 12],
+  }, false);
+  body.position.set(0, 0, 0);
+  skinGroup.add(body);
+
+  const bodyOL = makeBodyPart(8.5*S, 12.5*S, 4.5*S, {
+    right: [16, 36, 4, 12], left: [28, 36, 4, 12],
+    top: [20, 32, 8, 4], bottom: [28, 32, 8, 4],
+    front: [20, 36, 8, 12], back: [32, 36, 8, 12],
+  }, true);
+  bodyOL.position.copy(body.position);
+  skinGroup.add(bodyOL);
+
+  // ── RIGHT ARM (3x12x4, slim) — at -X (character's right) ──
+  // outer=[40,20], inner=[47,20]; outer faces -X = char right
+  const rArm = makeBodyPart(3*S, 12*S, 4*S, {
+    right: [40, 20, 4, 12], left: [47, 20, 4, 12],
+    top: [44, 16, 3, 4], bottom: [47, 16, 3, 4],
+    front: [44, 20, 3, 12], back: [51, 20, 3, 12],
+  }, false);
+  rArm.position.set(-5.5*S, 0, 0);
+  skinGroup.add(rArm);
+
+  const rArmOL = makeBodyPart(3.5*S, 12.5*S, 4.5*S, {
+    right: [40, 36, 4, 12], left: [47, 36, 4, 12],
+    top: [44, 32, 3, 4], bottom: [47, 32, 3, 4],
+    front: [44, 36, 3, 12], back: [51, 36, 3, 12],
+  }, true);
+  rArmOL.position.copy(rArm.position);
+  skinGroup.add(rArmOL);
+
+  // ── LEFT ARM (3x12x4, slim) — at +X (character's left) ──
+  // outer=[39,52], inner=[32,52]; outer faces +X = char left
+  const lArm = makeBodyPart(3*S, 12*S, 4*S, {
+    right: [32, 52, 4, 12], left: [39, 52, 4, 12],
+    top: [36, 48, 3, 4], bottom: [39, 48, 3, 4],
+    front: [36, 52, 3, 12], back: [43, 52, 3, 12],
+  }, false);
+  lArm.position.set(5.5*S, 0, 0);
+  skinGroup.add(lArm);
+
+  const lArmOL = makeBodyPart(3.5*S, 12.5*S, 4.5*S, {
+    right: [48, 52, 4, 12], left: [55, 52, 4, 12],
+    top: [52, 48, 3, 4], bottom: [55, 48, 3, 4],
+    front: [52, 52, 3, 12], back: [59, 52, 3, 12],
+  }, true);
+  lArmOL.position.copy(lArm.position);
+  skinGroup.add(lArmOL);
+
+  // ── RIGHT LEG (4x12x4) — at -X (character's right) ──
+  // outer=[0,20], inner=[8,20]; outer faces -X = char right
+  const rLeg = makeBodyPart(4*S, 12*S, 4*S, {
+    right: [0, 20, 4, 12], left: [8, 20, 4, 12],
+    top: [4, 16, 4, 4], bottom: [8, 16, 4, 4],
+    front: [4, 20, 4, 12], back: [12, 20, 4, 12],
+  }, false);
+  rLeg.position.set(-2*S, -12*S, 0);
+  skinGroup.add(rLeg);
+
+  const rLegOL = makeBodyPart(4.25*S, 12.25*S, 4.25*S, {
+    right: [0, 36, 4, 12], left: [8, 36, 4, 12],
+    top: [4, 32, 4, 4], bottom: [8, 32, 4, 4],
+    front: [4, 36, 4, 12], back: [12, 36, 4, 12],
+  }, true);
+  rLegOL.position.copy(rLeg.position);
+  skinGroup.add(rLegOL);
+
+  // ── LEFT LEG (4x12x4) — at +X (character's left) ──
+  // outer=[24,52], inner=[16,52]; outer faces +X = char left
+  const lLeg = makeBodyPart(4*S, 12*S, 4*S, {
+    right: [16, 52, 4, 12], left: [24, 52, 4, 12],
+    top: [20, 48, 4, 4], bottom: [24, 48, 4, 4],
+    front: [20, 52, 4, 12], back: [28, 52, 4, 12],
+  }, false);
+  lLeg.position.set(2*S, -12*S, 0);
+  skinGroup.add(lLeg);
+
+  const lLegOL = makeBodyPart(4.25*S, 12.25*S, 4.25*S, {
+    right: [0, 52, 4, 12], left: [8, 52, 4, 12],
+    top: [4, 48, 4, 4], bottom: [8, 48, 4, 4],
+    front: [4, 52, 4, 12], back: [12, 52, 4, 12],
+  }, true);
+  lLegOL.position.copy(lLeg.position);
+  skinGroup.add(lLegOL);
+}
+
+function updateTexture(transformedData) {
+  const imgData = textureCtx.createImageData(64, 64);
+  imgData.data.set(transformedData);
+  textureCtx.putImageData(imgData, 0, 0);
+  skinTexture.needsUpdate = true;
+}
+
+function updatePreview() {
+  const transformed = applyTransforms(baseImageData);
+  updateTexture(transformed);
+  updateSkinName();
+}
+
+function updateSkinName() {
+  const s = SUIT_COLORS[currentSelection.suit][0];
+  const t = TIE_COLORS[currentSelection.tie][0];
+  const h = HAIR_COLORS[currentSelection.hair][0];
+  const e = EYE_COLORS[currentSelection.eyes][0];
+  const sp = SPARK_COLORS[currentSelection.spark][0];
+  const cr = CROWN_COLORS[currentSelection.crown][0];
+  document.getElementById('skinName').innerHTML = `<span class="skin-name-prefix">&gt;</span> ${s}-${t}-${h}-${e}-${sp}-${cr}-skin.png`;
+}
+
+// ══════════════════════════════════════════════
+// UI BUILDER
+// ══════════════════════════════════════════════
+
+function prettyName(rawName) {
+  return rawName.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function makeSwatchColor(type, opt) {
+  if (type === 'suit') {
+    const v = Math.min(0.65, 0.22 * opt[3]);
+    const [r, g, b] = hsvToRgb(opt[1], opt[2] * 0.85, v);
+    return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
+  }
+  if (type === 'tie' || type === 'spark' || type === 'crown') {
+    const v = Math.min(0.9, 0.72 * opt[3]);
+    const [r, g, b] = hsvToRgb(opt[1], Math.max(opt[2], 0.15), v);
+    return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
+  }
+  if (type === 'hair') {
+    const v = Math.min(0.55, 0.14 * opt[3] + 0.06);
+    const [r, g, b] = hsvToRgb(opt[1], opt[2] * 0.85, v);
+    return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
+  }
+  return '#888';
+}
+
+const OPTION_GROUPS = [
+  { key: 'suit',   title: 'Suit Color',   icon: '🧥', bg: 'rgba(79,140,255,0.12)',  data: SUIT_COLORS },
+  { key: 'tie',    title: 'Tie Color',    icon: '👔', bg: 'rgba(239,68,68,0.12)',   data: TIE_COLORS },
+  { key: 'hair',   title: 'Hair Color',   icon: '💇', bg: 'rgba(234,179,8,0.12)',   data: HAIR_COLORS },
+  { key: 'eyes',   title: 'Eye Color',    icon: '👁', bg: 'rgba(16,185,129,0.12)',  data: EYE_COLORS },
+  { key: 'spark',  title: 'Spark Color',  icon: '⚡', bg: 'rgba(168,85,247,0.12)',  data: SPARK_COLORS },
+  { key: 'crown',  title: 'Crown Color',  icon: '👑', bg: 'rgba(244,63,94,0.12)',   data: CROWN_COLORS },
+];
+
+function buildUI() {
+  const container = document.getElementById('optionsContainer');
+
+  for (const group of OPTION_GROUPS) {
+    const div = document.createElement('div');
+    div.className = 'option-group';
+    div.innerHTML = `
+      <div class="option-header">
+        <div class="option-icon" style="background:${group.bg}">${group.icon}</div>
+        <div class="option-title">${group.title}</div>
+        <div class="option-count">${group.data.length} options</div>
+        <div class="option-chevron">▼</div>
+      </div>
+      <div class="option-grid" id="grid-${group.key}"></div>
+    `;
+    container.appendChild(div);
+
+    // Collapsible toggle
+    const header = div.querySelector('.option-header');
+    header.addEventListener('click', (e) => {
+      if (e.target.closest('.opt-btn')) return;
+      div.classList.toggle('collapsed');
+    });
+
+    const grid = div.querySelector('.option-grid');
+
+    group.data.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn' + (idx === 0 ? ' active' : '');
+      btn.dataset.group = group.key;
+      btn.dataset.index = idx;
+
+      if (group.key === 'eyes') {
+        const main = opt[1], dark = opt[2];
+        const mainC = `rgb(${main[0]},${main[1]},${main[2]})`;
+        const darkC = `rgb(${dark[0]},${dark[1]},${dark[2]})`;
+        btn.innerHTML = `
+          <div class="opt-swatch-eye" style="--emain:${mainC};--edark:${darkC}">
+            <div style="position:absolute;left:0;top:0;width:50%;height:100%;background:${darkC}"></div>
+            <div style="position:absolute;right:0;top:0;width:50%;height:100%;background:${mainC}"></div>
+          </div>
+          <span>${prettyName(opt[0])}</span>
+        `;
+      } else {
+        const color = makeSwatchColor(group.key, opt);
+        btn.innerHTML = `
+          <div class="opt-swatch" style="background:${color}"></div>
+          <span>${prettyName(opt[0])}</span>
+        `;
+      }
+
+      btn.addEventListener('click', () => {
+        grid.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSelection[group.key] = idx;
+        updatePreview();
+      });
+
+      grid.appendChild(btn);
+    });
+  }
+}
+
+// ══════════════════════════════════════════════
+// DOWNLOAD
+// ══════════════════════════════════════════════
+
+function downloadSkin() {
+  const transformed = applyTransforms(baseImageData);
+  const canvas = document.createElement('canvas');
+  canvas.width = 64; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.createImageData(64, 64);
+  imgData.data.set(transformed);
+  ctx.putImageData(imgData, 0, 0);
+
+  const link = document.createElement('a');
+  const s = SUIT_COLORS[currentSelection.suit][0];
+  const t = TIE_COLORS[currentSelection.tie][0];
+  const h = HAIR_COLORS[currentSelection.hair][0];
+  const e = EYE_COLORS[currentSelection.eyes][0];
+  const sp = SPARK_COLORS[currentSelection.spark][0];
+  const cr = CROWN_COLORS[currentSelection.crown][0];
+  link.download = `${s}-${t}-${h}-${e}-${sp}-${cr}-skin.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// ══════════════════════════════════════════════
+// PARTICLE BACKGROUND
+// ══════════════════════════════════════════════
+
+function initParticles() {
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  const PARTICLE_COUNT = 45;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Particle types: blocks (squares), orbs (glowing circles), diamonds
+  const types = ['block', 'block', 'block', 'orb', 'orb', 'diamond'];
+  const blockColors = ['rgba(90,172,64,0.3)', 'rgba(61,122,42,0.25)', 'rgba(122,122,122,0.2)', 'rgba(80,60,40,0.2)', 'rgba(68,68,68,0.15)'];
+  const orbColor = 'rgba(127,239,63,0.4)';
+  const diamondColor = 'rgba(95,240,240,0.35)';
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const type = types[Math.floor(Math.random() * types.length)];
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: type === 'block' ? 2 + Math.random() * 3 : type === 'orb' ? 2 + Math.random() * 2 : 3 + Math.random() * 2,
+      speedY: -(0.15 + Math.random() * 0.35),
+      speedX: (Math.random() - 0.5) * 0.2,
+      sway: Math.random() * Math.PI * 2,
+      swaySpeed: 0.005 + Math.random() * 0.01,
+      opacity: 0.1 + Math.random() * 0.4,
+      type,
+      color: type === 'block' ? blockColors[Math.floor(Math.random() * blockColors.length)] : type === 'orb' ? orbColor : diamondColor,
+      rotation: Math.random() * Math.PI * 2,
+      rotSpeed: (Math.random() - 0.5) * 0.02,
+    });
+  }
+
+  function drawParticle(p) {
+    ctx.save();
+    ctx.globalAlpha = p.opacity;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+
+    if (p.type === 'block') {
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+    } else if (p.type === 'orb') {
+      const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size * 2);
+      grad.addColorStop(0, p.color);
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size * 2, 0, Math.PI * 2);
+      ctx.fill();
+      // Bright center
+      ctx.fillStyle = 'rgba(200,255,150,0.6)';
+      ctx.fillRect(-1, -1, 2, 2);
+    } else {
+      // Diamond shape
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.moveTo(0, -p.size);
+      ctx.lineTo(p.size * 0.6, 0);
+      ctx.moveTo(0, p.size);
+      ctx.lineTo(-p.size * 0.6, 0);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of particles) {
+      p.sway += p.swaySpeed;
+      p.x += p.speedX + Math.sin(p.sway) * 0.15;
+      p.y += p.speedY;
+      p.rotation += p.rotSpeed;
+
+      // Fade out near top
+      if (p.y < canvas.height * 0.15) {
+        p.opacity *= 0.995;
+      }
+
+      // Reset when off screen
+      if (p.y < -10 || p.opacity < 0.02) {
+        p.x = Math.random() * canvas.width;
+        p.y = canvas.height + 10;
+        p.opacity = 0.1 + Math.random() * 0.4;
+      }
+
+      drawParticle(p);
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+// ══════════════════════════════════════════════
+// VIEWER STARS
+// ══════════════════════════════════════════════
+
+function initViewerStars() {
+  const container = document.getElementById('viewerStars');
+  const starCount = 30;
+  for (let i = 0; i < starCount; i++) {
+    const star = document.createElement('div');
+    star.className = 'viewer-star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 60 + '%'; // Top 60% only (sky area)
+    star.style.setProperty('--dur', (2 + Math.random() * 4) + 's');
+    star.style.setProperty('--delay', (Math.random() * 3) + 's');
+    if (Math.random() > 0.7) {
+      star.style.width = '1px';
+      star.style.height = '1px';
+    }
+    container.appendChild(star);
+  }
+}
+
+// ══════════════════════════════════════════════
+// STONE PLATFORM (3D viewer)
+// ══════════════════════════════════════════════
+
+function addStonePlatform() {
+  // A proper Minecraft stone block: 16x16x16 cube
+  const blockSize = 16;
+  const blockGeo = new THREE.BoxGeometry(blockSize, blockSize, blockSize);
+
+  // Generate a pixel-accurate Minecraft stone texture (16x16)
+  const texCanvas = document.createElement('canvas');
+  texCanvas.width = 16;
+  texCanvas.height = 16;
+  const ctx = texCanvas.getContext('2d');
+
+  // Base fill — medium grey
+  ctx.fillStyle = '#828282';
+  ctx.fillRect(0, 0, 16, 16);
+
+  // Minecraft stone has irregular grey splotches at the pixel level
+  // We'll paint pixel-by-pixel with weighted random greys
+  const palette = [
+    '#7e7e7e', '#808080', '#828282', '#858585', '#7a7a7a',
+    '#767676', '#8a8a8a', '#737373', '#6f6f6f', '#8e8e8e',
+    '#717171', '#797979', '#848484', '#878787', '#747474',
+  ];
+
+  // First pass: base noise
+  for (let py = 0; py < 16; py++) {
+    for (let px = 0; px < 16; px++) {
+      ctx.fillStyle = palette[Math.floor(Math.random() * palette.length)];
+      ctx.fillRect(px, py, 1, 1);
+    }
+  }
+
+  // Second pass: darker splotch clusters (2-4px irregular shapes)
+  const darkShades = ['#6b6b6b', '#696969', '#656565', '#626262'];
+  for (let i = 0; i < 6; i++) {
+    const sx = Math.floor(Math.random() * 14);
+    const sy = Math.floor(Math.random() * 14);
+    const shade = darkShades[Math.floor(Math.random() * darkShades.length)];
+    ctx.fillStyle = shade;
+    // Random small cluster
+    const w = 1 + Math.floor(Math.random() * 3);
+    const h = 1 + Math.floor(Math.random() * 3);
+    for (let dy = 0; dy < h; dy++) {
+      for (let dx = 0; dx < w; dx++) {
+        if (Math.random() > 0.3) {
+          ctx.fillRect(sx + dx, sy + dy, 1, 1);
+        }
+      }
+    }
+  }
+
+  // Third pass: lighter highlight spots
+  const lightShades = ['#909090', '#949494', '#8f8f8f'];
+  for (let i = 0; i < 4; i++) {
+    const sx = Math.floor(Math.random() * 14);
+    const sy = Math.floor(Math.random() * 14);
+    ctx.fillStyle = lightShades[Math.floor(Math.random() * lightShades.length)];
+    const w = 1 + Math.floor(Math.random() * 2);
+    const h = 1 + Math.floor(Math.random() * 2);
+    for (let dy = 0; dy < h; dy++) {
+      for (let dx = 0; dx < w; dx++) {
+        if (Math.random() > 0.4) {
+          ctx.fillRect(sx + dx, sy + dy, 1, 1);
+        }
+      }
+    }
+  }
+
+  const blockTex = new THREE.CanvasTexture(texCanvas);
+  blockTex.magFilter = THREE.NearestFilter;
+  blockTex.minFilter = THREE.NearestFilter;
+  blockTex.generateMipmaps = false;
+
+  const blockMat = new THREE.MeshLambertMaterial({ map: blockTex });
+  const block = new THREE.Mesh(blockGeo, blockMat);
+
+  // Position: top face of the block at y = -18 (where character feet are)
+  block.position.set(0, -18 - blockSize / 2, 0);
+  scene.add(block);
+
+  // Remove the old shadow circle if present
+  scene.children.forEach(child => {
+    if (child.geometry && child.geometry.type === 'CircleGeometry') {
+      scene.remove(child);
+    }
+  });
+}
+
+// ══════════════════════════════════════════════
+// LOADING BAR ANIMATION
+// ══════════════════════════════════════════════
+
+function animateLoadingBar(progress) {
+  const bar = document.getElementById('loadingBar');
+  if (bar) bar.style.width = progress + '%';
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+
+function init() {
+  // Start particles immediately
+  initParticles();
+  initViewerStars();
+
+  // Animate loading bar
+  animateLoadingBar(20);
+
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    animateLoadingBar(50);
+
+    // Draw to temp canvas to get pixel data
+    const c = document.createElement('canvas');
+    c.width = 64; c.height = 64;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const data = ctx.getImageData(0, 0, 64, 64).data;
+
+    // Unify left/right shading (same as Python script)
+    const unified = new Uint8ClampedArray(data);
+    const shadingMap = [[17,20],[28,33],[39,46],[189,223],[21,20],[36,33],[23,25],[198,233],[209,246]];
+    for (let i = 0; i < unified.length; i += 4) {
+      const r = unified[i], g = unified[i+1], b = unified[i+2];
+      for (const [from, to] of shadingMap) {
+        if (r === from && g === from && b === from) {
+          unified[i] = to; unified[i+1] = to; unified[i+2] = to;
+          break;
+        }
+      }
+    }
+
+    animateLoadingBar(70);
+
+    baseImageData = unified;
+    classifyAndBuildMasks(unified);
+
+    animateLoadingBar(85);
+
+    initViewer();
+    addStonePlatform();
+    buildUI();
+    updatePreview();
+
+    animateLoadingBar(100);
+
+    // Hide loading after bar fills
+    setTimeout(() => {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+    }, 400);
+  };
+  img.onerror = () => {
+    document.querySelector('.loading-text').textContent =
+      'Error: Could not load skin file. Serve via HTTP.';
+  };
+  img.src = 'c1e9862df153554f.png';
+
+  document.getElementById('downloadBtn').addEventListener('click', downloadSkin);
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    currentSelection = { suit: 0, tie: 0, hair: 0, eyes: 0, spark: 0, crown: 0 };
+    document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.option-grid').forEach(grid => {
+      const first = grid.querySelector('.opt-btn');
+      if (first) first.classList.add('active');
+    });
+    updatePreview();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
