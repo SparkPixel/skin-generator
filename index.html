@@ -354,157 +354,221 @@
       border-bottom: 2px solid var(--mc-stone);
     }
 
-    /* ── OPTIONS ── */
+    /* ── OPTIONS — TABBED SWATCH GRID ── */
     .options-section {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 0;
     }
 
-    .option-group {
+    .options-card {
       background: var(--bg-card);
       border: 2px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px 16px;
       backdrop-filter: blur(8px);
-      transition: all 0.3s ease;
-      position: relative;
       overflow: hidden;
+      position: relative;
     }
-    .option-group::before {
+    .options-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       height: 2px;
       background: linear-gradient(90deg, var(--mc-green), var(--mc-cyan), var(--mc-purple));
-      opacity: 0.5;
-    }
-    .option-group:hover {
-      border-color: var(--border-hover);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      opacity: 0.6;
+      z-index: 2;
     }
 
-    .option-header {
+    /* Tab bar */
+    .tab-bar {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      user-select: none;
+      gap: 2px;
+      padding: 10px 12px 0;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
+    .tab-bar::-webkit-scrollbar { display: none; }
 
-    .option-icon {
-      width: 26px;
-      height: 26px;
-      border-radius: 3px;
+    .tab-btn {
+      flex-shrink: 0;
+      width: 42px;
+      height: 38px;
+      border: none;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      background: transparent;
+      cursor: pointer;
+      font-size: 16px;
       display: grid;
       place-items: center;
-      font-size: 13px;
+      transition: all 0.2s ease;
+      position: relative;
+      scroll-snap-align: start;
+      color: var(--text-secondary);
+      border-bottom: 2px solid transparent;
     }
-
-    .option-title {
+    .tab-btn:hover {
+      background: rgba(255,255,255,0.04);
+      color: var(--text-primary);
+    }
+    .tab-btn.active {
+      background: rgba(90,172,64,0.08);
+      color: #fff;
+      border-bottom: 2px solid var(--mc-green);
+    }
+    .tab-btn .tab-tooltip {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
       font-family: var(--font-pixel);
-      font-size: 0.55rem;
-      font-weight: 400;
-      letter-spacing: 0.02em;
+      font-size: 0.38rem;
+      color: var(--text-primary);
+      background: rgba(0,0,0,0.9);
+      border: 1px solid rgba(90,172,64,0.3);
+      padding: 3px 7px;
+      border-radius: 2px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 10;
+    }
+    .tab-btn:hover .tab-tooltip { opacity: 1; }
+
+    .tab-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 0;
     }
 
-    .option-count {
-      margin-left: auto;
-      font-family: var(--font-pixel);
-      font-size: 0.4rem;
-      color: var(--text-dim);
-    }
-
-    .option-chevron {
-      color: var(--text-dim);
-      font-size: 0.6rem;
-      transition: transform 0.3s ease;
-      margin-left: 6px;
-    }
-    .option-group.collapsed .option-chevron {
-      transform: rotate(-90deg);
-    }
-    .option-group.collapsed .option-grid {
+    /* Swatch panel */
+    .swatch-panel {
       display: none;
+      padding: 14px 16px 12px;
+      animation: panelFadeIn 0.15s ease;
+    }
+    .swatch-panel.active { display: block; }
+
+    @keyframes panelFadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .option-grid {
+    .panel-header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .panel-title {
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      color: var(--text-primary);
+    }
+    .panel-count {
+      font-family: var(--font-pixel);
+      font-size: 0.38rem;
+      color: var(--text-dim);
     }
 
-    .opt-btn {
-      display: inline-flex;
-      align-items: center;
+    /* Swatch grid */
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 36px);
       gap: 6px;
-      padding: 5px 10px 5px 6px;
-      background: rgba(255,255,255,0.03);
-      border: 1.5px solid rgba(255,255,255,0.06);
-      border-radius: var(--radius);
+      justify-content: start;
+    }
+
+    .swatch {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      border: 2px solid rgba(255,255,255,0.08);
       cursor: pointer;
       transition: all 0.18s ease;
-      font-family: var(--font-body);
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      white-space: nowrap;
-    }
-
-    .opt-btn:hover {
-      background: rgba(255,255,255,0.07);
-      border-color: rgba(255,255,255,0.15);
-      color: var(--text-primary);
-      transform: translateY(-1px);
-    }
-
-    .opt-btn.active {
-      background: rgba(90,172,64,0.12);
-      border-color: var(--mc-green);
-      color: #fff;
-      box-shadow: 0 0 12px var(--accent-glow);
-      animation: active-pulse 2s ease-in-out infinite;
-    }
-    @keyframes active-pulse {
-      0%, 100% { box-shadow: 0 0 8px var(--accent-glow); }
-      50% { box-shadow: 0 0 16px var(--accent-glow); }
-    }
-
-    .opt-swatch {
-      width: 18px;
-      height: 18px;
-      border-radius: 3px;
-      flex-shrink: 0;
-      border: 1.5px solid rgba(255,255,255,0.15);
-    }
-
-    .opt-btn.active .opt-swatch {
-      border-color: rgba(255,255,255,0.5);
-      box-shadow: 0 0 6px rgba(255,255,255,0.2);
-    }
-
-    /* Eye swatches show two colors */
-    .opt-swatch-eye {
-      width: 18px;
-      height: 18px;
-      border-radius: 3px;
-      flex-shrink: 0;
-      border: 1.5px solid rgba(255,255,255,0.15);
-      overflow: hidden;
       position: relative;
+      outline: none;
     }
-    .opt-swatch-eye::before,
-    .opt-swatch-eye::after {
-      content: '';
+    .swatch:hover {
+      transform: scale(1.15);
+      border-color: rgba(255,255,255,0.25);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      z-index: 3;
+    }
+    .swatch:focus-visible {
+      border-color: var(--mc-cyan);
+      box-shadow: 0 0 0 2px rgba(95,240,240,0.4);
+    }
+    .swatch.active {
+      border-color: var(--mc-green-bright);
+      box-shadow: 0 0 10px var(--accent-glow), inset 0 0 0 1px rgba(255,255,255,0.15);
+      animation: swatch-pulse 2s ease-in-out infinite;
+    }
+    @keyframes swatch-pulse {
+      0%, 100% { box-shadow: 0 0 8px var(--accent-glow), inset 0 0 0 1px rgba(255,255,255,0.15); }
+      50% { box-shadow: 0 0 16px var(--accent-glow), inset 0 0 0 1px rgba(255,255,255,0.25); }
+    }
+
+    /* Swatch hover tooltip */
+    .swatch[data-name]::after {
+      content: attr(data-name);
       position: absolute;
-      top: 0; width: 50%; height: 100%;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-pixel);
+      font-size: 0.35rem;
+      color: var(--text-primary);
+      background: rgba(0,0,0,0.92);
+      border: 1px solid rgba(90,172,64,0.25);
+      padding: 3px 8px;
+      border-radius: 2px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 10;
     }
-    .opt-swatch-eye::before { left: 0; }
-    .opt-swatch-eye::after { right: 0; }
+    .swatch:hover[data-name]::after { opacity: 1; }
+
+    /* Eye swatch two-tone */
+    .swatch-eye {
+      overflow: hidden;
+      display: flex;
+    }
+    .swatch-eye-half {
+      width: 50%;
+      height: 100%;
+    }
+
+    /* Selected label at bottom */
+    .selected-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-family: var(--font-pixel);
+      font-size: 0.4rem;
+      color: var(--text-secondary);
+    }
+    .selected-label-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      border: 1px solid rgba(255,255,255,0.2);
+      flex-shrink: 0;
+    }
+    .selected-label-text {
+      color: var(--mc-green-bright);
+    }
 
     /* ── LOADING ── */
     .loading-overlay {
@@ -681,29 +745,56 @@
 // DATA — matches generate_variants.py exactly
 // ══════════════════════════════════════════════
 
-const SUIT_COLORS = [
-  ["black_suit", 0.0, 0.0, 1.0],
-  ["charcoal_suit", 0.0, 0.0, 1.2],
-  ["grey_suit", 0.0, 0.0, 1.5],
-  ["light_grey_suit", 0.0, 0.0, 1.8],
-  ["navy_suit", 0.62, 0.65, 1.0],
-  ["royal_blue_suit", 0.60, 0.70, 1.1],
-  ["midnight_suit", 0.65, 0.55, 0.85],
-  ["burgundy_suit", 0.97, 0.65, 1.0],
-  ["wine_suit", 0.95, 0.55, 0.95],
-  ["crimson_suit", 0.0, 0.60, 1.05],
-  ["forest_suit", 0.38, 0.55, 1.0],
-  ["emerald_suit", 0.42, 0.65, 1.1],
-  ["olive_suit", 0.22, 0.45, 1.05],
-  ["purple_suit", 0.78, 0.60, 1.0],
-  ["plum_suit", 0.83, 0.45, 1.0],
-  ["teal_suit", 0.50, 0.55, 1.0],
-  ["brown_suit", 0.07, 0.50, 1.0],
-  ["tan_suit", 0.10, 0.30, 1.4],
-  ["cream_suit", 0.12, 0.15, 2.0],
-  ["white_suit", 0.12, 0.08, 2.2],
-  ["rust_suit", 0.04, 0.65, 1.0],
-  ["copper_suit", 0.05, 0.60, 1.2],
+const JACKET_COLORS = [
+  ["black_jacket", 0.0, 0.0, 1.0],
+  ["charcoal_jacket", 0.0, 0.0, 1.2],
+  ["grey_jacket", 0.0, 0.0, 1.5],
+  ["light_grey_jacket", 0.0, 0.0, 1.8],
+  ["navy_jacket", 0.62, 0.65, 1.0],
+  ["royal_blue_jacket", 0.60, 0.70, 1.1],
+  ["midnight_jacket", 0.65, 0.55, 0.85],
+  ["burgundy_jacket", 0.97, 0.65, 1.0],
+  ["wine_jacket", 0.95, 0.55, 0.95],
+  ["crimson_jacket", 0.0, 0.60, 1.05],
+  ["forest_jacket", 0.38, 0.55, 1.0],
+  ["emerald_jacket", 0.42, 0.65, 1.1],
+  ["olive_jacket", 0.22, 0.45, 1.05],
+  ["purple_jacket", 0.78, 0.60, 1.0],
+  ["plum_jacket", 0.83, 0.45, 1.0],
+  ["teal_jacket", 0.50, 0.55, 1.0],
+  ["brown_jacket", 0.07, 0.50, 1.0],
+  ["tan_jacket", 0.10, 0.30, 1.4],
+  ["cream_jacket", 0.12, 0.15, 2.0],
+  ["white_jacket", 0.12, 0.08, 2.2],
+  ["rust_jacket", 0.04, 0.65, 1.0],
+  ["copper_jacket", 0.05, 0.60, 1.2],
+];
+
+const PANTS_COLORS = [
+  ["black_pants", 0.0, 0.0, 1.0],
+  ["charcoal_pants", 0.0, 0.0, 1.2],
+  ["grey_pants", 0.0, 0.0, 1.5],
+  ["light_grey_pants", 0.0, 0.0, 1.8],
+  ["navy_pants", 0.62, 0.65, 1.0],
+  ["royal_blue_pants", 0.60, 0.70, 1.1],
+  ["midnight_pants", 0.65, 0.55, 0.85],
+  ["burgundy_pants", 0.97, 0.65, 1.0],
+  ["wine_pants", 0.95, 0.55, 0.95],
+  ["crimson_pants", 0.0, 0.60, 1.05],
+  ["forest_pants", 0.38, 0.55, 1.0],
+  ["emerald_pants", 0.42, 0.65, 1.1],
+  ["olive_pants", 0.22, 0.45, 1.05],
+  ["purple_pants", 0.78, 0.60, 1.0],
+  ["plum_pants", 0.83, 0.45, 1.0],
+  ["teal_pants", 0.50, 0.55, 1.0],
+  ["brown_pants", 0.07, 0.50, 1.0],
+  ["tan_pants", 0.10, 0.30, 1.4],
+  ["cream_pants", 0.12, 0.15, 2.0],
+  ["white_pants", 0.12, 0.08, 2.2],
+  ["khaki_pants", 0.11, 0.35, 1.5],
+  ["jeans_pants", 0.58, 0.50, 1.2],
+  ["rust_pants", 0.04, 0.65, 1.0],
+  ["copper_pants", 0.05, 0.60, 1.2],
 ];
 
 const TIE_COLORS = [
@@ -723,6 +814,19 @@ const TIE_COLORS = [
   ["white_tie", 0.12, 0.08, 1.4],
   ["yellow_tie", 0.16, 0.75, 1.2],
   ["coral_tie", 0.02, 0.55, 1.0],
+];
+
+const SHIRT_COLORS = [
+  ["white_shirt", 0.0, 0.0, 1.0],        // default — no change
+  ["light_blue_shirt", 0.58, 0.20, 1.0],
+  ["pink_shirt", 0.93, 0.18, 1.0],
+  ["lavender_shirt", 0.75, 0.15, 1.0],
+  ["mint_shirt", 0.42, 0.18, 1.0],
+  ["cream_shirt", 0.12, 0.12, 1.0],
+  ["grey_shirt", 0.0, 0.0, 0.85],
+  ["black_shirt", 0.0, 0.0, 0.35],
+  ["yellow_shirt", 0.15, 0.25, 1.0],
+  ["peach_shirt", 0.05, 0.20, 1.0],
 ];
 
 const HAIR_COLORS = [
@@ -757,7 +861,35 @@ const EYE_COLORS = [
   ["cyan_eyes", [40,180,200], [20,140,160]],
 ];
 
+const SKIN_TONE_COLORS = [
+  // name, hue-shift, sat-mult, val-mult — applied relative to base skin HSV
+  ["default_skin", 0.0, 1.0, 1.0],
+  ["light_skin", 0.0, 0.7, 1.12],
+  ["pale_skin", 0.0, 0.5, 1.2],
+  ["tan_skin", 0.02, 1.2, 0.92],
+  ["olive_skin", 0.06, 1.1, 0.85],
+  ["brown_skin", 0.02, 1.3, 0.65],
+  ["dark_skin", 0.01, 1.4, 0.48],
+  ["deep_skin", 0.0, 1.5, 0.35],
+  ["zombie_skin", 0.38, 0.8, 0.75],
+  ["ender_skin", 0.78, 0.9, 0.55],
+  ["blaze_skin", 0.08, 1.3, 0.9],
+  ["frost_skin", 0.55, 0.4, 1.15],
+];
+
+const SHOE_COLORS = [
+  ["default_shoes", 0.0, 0.0, 1.0],       // keep as-is (white/grey from shirt)
+  ["black_shoes", 0.0, 0.0, 0.2],
+  ["brown_shoes", 0.07, 0.55, 0.45],
+  ["tan_shoes", 0.10, 0.35, 0.7],
+  ["white_shoes", 0.0, 0.0, 1.1],
+  ["red_shoes", 0.0, 0.65, 0.55],
+  ["blue_shoes", 0.60, 0.55, 0.5],
+  ["green_shoes", 0.38, 0.50, 0.45],
+];
+
 const SPARK_COLORS = [
+  ["none_spark", 0, 0, 0],  // none = hide
   ["gold_spark", 0.13, 0.75, 1.0],
   ["red_spark", 0.0, 0.70, 1.0],
   ["orange_spark", 0.08, 0.70, 1.0],
@@ -769,6 +901,7 @@ const SPARK_COLORS = [
 ];
 
 const CROWN_COLORS = [
+  ["none_crown", 0, 0, 0],  // none = hide
   ["gold_crown", 0.13, 0.75, 1.0],
   ["red_crown", 0.0, 0.70, 1.0],
   ["orange_crown", 0.08, 0.70, 1.0],
@@ -777,6 +910,115 @@ const CROWN_COLORS = [
   ["blue_crown", 0.60, 0.70, 1.0],
   ["purple_crown", 0.78, 0.65, 1.0],
   ["pink_crown", 0.93, 0.55, 1.0],
+];
+
+const MASK_TYPES = [
+  ["none_mask", 0, 0, 0],
+  ["hacker_mask", 0, 0, 1.0],
+  ["shadow_mask", 0.0, 0.0, 0.2],
+  ["enderman_mask", 0.0, 0.0, 0.2]
+];
+
+const MASK_COLORS = [
+  ["white", 0.0, 0.0, 1.0],
+  ["black", 0.0, 0.0, 0.2],
+  ["grey", 0.0, 0.0, 0.6],
+  ["red", 0.0, 0.70, 1.0],
+  ["blue", 0.60, 0.70, 1.0],
+  ["green", 0.38, 0.65, 1.0],
+  ["purple", 0.78, 0.65, 1.0],
+  ["gold", 0.13, 0.75, 1.0],
+  ["cyan", 0.52, 0.75, 1.0],
+  ["pink", 0.93, 0.55, 1.0],
+  ["orange", 0.08, 0.70, 1.0],
+];
+
+// Shadow mask pixel data: [x, y, original brightness] 
+// Only for the front overlay (right half: x=44-47), so it doesn't bleed to the other side or cover the crown.
+const SHADOW_MASK_PIXELS = [
+  [46,8,11], [44,9,21], [47,9,31], [46,10,11], [47,10,2], [47,14,0], [46,15,0]
+];
+
+// Extracted Enderman mask from source file
+const ENDER_FRONT_B = [
+  [[13,7,13], [13,7,13], [3,2,3], [3,2,3]],
+  [[16,14,17], [16,14,17], [19,14,22], [3,2,3]],
+  [[19,14,22], [32,24,37], [32,24,37], [19,14,22]],
+  [[32,24,37], [46,34,53], [46,34,53], [46,34,53]],
+  [[46,34,53], [219,148,250], [227,173,251], [219,148,250]],
+  [[32,24,37], [46,34,53], [46,34,53], [32,24,37]],
+  [[19,14,22], [32,24,37], [32,24,37], [19,14,22]],
+  [[19,14,22], [19,14,22], [19,14,22], [3,2,3]]
+];
+const ENDER_FRONT_O = [
+  [[-1], [-1], [19,14,22], [-1]],
+  [[-1], [16,14,17], [19,14,22], [19,14,22]],
+  [[-1], [-1], [-1], [-1]],
+  [[32,24,37], [-1], [-1], [-1]],
+  [[-1], [-1], [227,173,251], [-1]],
+  [[-1], [-1], [-1], [-1]],
+  [[-1], [-1], [-1], [19,14,22]],
+  [[19,14,22], [19,14,22], [-1], [-1]]
+];
+const ENDER_LEFT_B = [
+  [[3,2,3], [3,2,3], [3,2,3], [3,2,3], [3,2,3], [3,2,3], [3,2,3], [3,2,3]],
+  [[3,2,3], [3,2,3], [3,2,3], [13,7,13], [18,12,18], [3,2,3], [18,12,18], [13,7,13]],
+  [[13,7,13], [3,2,3], [3,2,3], [18,12,18], [33,22,33], [3,2,3], [13,7,13], [3,2,3]],
+  [[32,24,37], [18,12,18], [3,2,3], [3,2,3], [18,12,18], [13,7,13], [3,2,3], [3,2,3]],
+  [[46,34,53], [32,24,37], [19,14,22], [6,4,6], [3,2,3], [13,7,13], [3,2,3], [3,2,3]],
+  [[32,24,37], [19,14,22], [6,4,6], [3,2,3], [18,12,18], [3,2,3], [3,2,3], [3,2,3]],
+  [[13,7,13], [3,2,3], [3,2,3], [18,12,18], [33,22,33], [18,12,18], [13,7,13], [3,2,3]],
+  [[3,2,3], [3,2,3], [3,2,3], [13,7,13], [18,12,18], [3,2,3], [3,2,3], [3,2,3]]
+];
+const ENDER_LEFT_O = [
+  [[-1], [3,2,3], [3,2,3], [3,2,3], [3,2,3], [3,2,3], [3,2,3], [-1]],
+  [[3,2,3], [3,2,3], [-1], [-1], [-1], [3,2,3], [-1], [13,7,13]],
+  [[-1], [-1], [-1], [-1], [-1], [-1], [-1], [-1]],
+  [[-1], [18,12,18], [-1], [-1], [18,12,18], [-1], [3,2,3], [3,2,3]],
+  [[-1], [-1], [-1], [-1], [-1], [-1], [3,2,3], [-1]],
+  [[-1], [-1], [-1], [-1], [-1], [-1], [3,2,3], [3,2,3]],
+  [[13,7,13], [3,2,3], [3,2,3], [18,12,18], [-1], [18,12,18], [-1], [3,2,3]],
+  [[-1], [3,2,3], [3,2,3], [-1], [18,12,18], [-1], [-1], [-1]]
+];
+const ENDER_TOP_B = [
+  [[13,7,13], [13,7,13], [3,2,3], [3,2,3]],
+  [[16,14,17], [16,14,17], [3,2,3], [3,2,3]],
+  [[16,14,17], [16,14,17], [3,2,3], [3,2,3]],
+  [[13,7,13], [16,14,17], [16,14,17], [3,2,3]],
+  [[16,14,17], [13,7,13], [16,14,17], [3,2,3]],
+  [[16,14,17], [16,14,17], [13,7,13], [3,2,3]],
+  [[16,14,17], [16,14,17], [16,14,17], [3,2,3]],
+  [[13,7,13], [16,14,17], [13,7,13], [3,2,3]]
+];
+const ENDER_TOP_O = [
+  [[13,7,13], [-1], [3,2,3], [-1]],
+  [[-1], [-1], [-1], [3,2,3]],
+  [[-1], [-1], [3,2,3], [3,2,3]],
+  [[-1], [-1], [-1], [3,2,3]],
+  [[-1], [13,7,13], [-1], [3,2,3]],
+  [[-1], [-1], [-1], [3,2,3]],
+  [[-1], [16,14,17], [-1], [3,2,3]],
+  [[-1], [-1], [13,7,13], [-1]]
+];
+const ENDER_BACK_B = [
+  [[3,2,3], [3,2,3], [3,2,3], [4,4,4]],
+  [[3,2,3], [3,2,3], [3,2,3], [3,2,3]],
+  [[3,2,3], [3,3,3], [4,4,4], [0,0,0]],
+  [[13,7,13], [16,14,17], [16,14,17], [3,2,3]],
+  [[18,12,18], [13,7,13], [9,9,9], [16,14,17]],
+  [[13,7,13], [3,2,3], [16,14,17], [3,2,3]],
+  [[3,2,3], [3,2,3], [6,6,6], [3,2,3]],
+  [[3,2,3], [0,0,0], [3,2,3], [3,2,3]]
+];
+const ENDER_BACK_O = [
+  [[-1], [3,2,3], [-1], [-1]],
+  [[-1], [-1], [-1], [-1]],
+  [[-1], [-1], [-1], [-1]],
+  [[13,7,13], [-1], [-1], [3,2,3]],
+  [[-1], [-1], [-1], [-1]],
+  [[-1], [-1], [-1], [-1]],
+  [[-1], [3,2,3], [-1], [-1]],
+  [[-1], [-1], [-1], [-1]]
 ];
 
 // ══════════════════════════════════════════════
@@ -857,8 +1099,8 @@ function rgbToHsv(r, g, b) {
 // ══════════════════════════════════════════════
 
 let baseImageData = null; // Uint8ClampedArray of the original (unified) 64x64 RGBA
-let masks = {}; // { suit: [{y,x,baseV}], tie: [...], hair: [...], accent: [...] }
-let currentSelection = { suit: 0, tie: 0, hair: 0, eyes: 0, spark: 0, crown: 0 };
+let masks = {}; // { jacket, pants, shirt, shoes, tie, hair, skinTone, spark, crown, mask }
+let currentSelection = { jacket: 0, pants: 0, tie: 0, shirt: 0, hair: 0, eyes: 0, skinTone: 0, shoes: 0, spark: 5, crown: 1, maskType: 1, maskColor: 0 };
 
 function buildRegionMask(regionNames) {
   const m = new Uint8Array(64 * 64);
@@ -875,20 +1117,48 @@ function buildRegionMask(regionNames) {
 function classifyAndBuildMasks(data) {
   const W = 64, H = 64;
 
-  // Build region masks
-  const suitBaseKeys = Object.keys(REGIONS).filter(k => (k.includes('body') || k.includes('arm') || k.includes('leg')) && !k.includes('overlay'));
-  const suitOverlayKeys = Object.keys(REGIONS).filter(k => (k.includes('body') || k.includes('arm') || k.includes('leg')) && k.includes('overlay'));
+  // Build region masks — split body+arm (jacket) from leg (pants)
+  const jacketBaseKeys = Object.keys(REGIONS).filter(k => (k.includes('body') || k.includes('arm')) && !k.includes('leg') && !k.includes('overlay'));
+  const jacketOverlayKeys = Object.keys(REGIONS).filter(k => (k.includes('body') || k.includes('arm')) && !k.includes('leg') && k.includes('overlay'));
+  const pantsBaseKeys = Object.keys(REGIONS).filter(k => k.includes('leg') && !k.includes('overlay'));
+  const pantsOverlayKeys = Object.keys(REGIONS).filter(k => k.includes('leg') && k.includes('overlay'));
   const headKeys = Object.keys(REGIONS).filter(k => k.startsWith('head'));
   const headBaseKeys = Object.keys(REGIONS).filter(k => k.startsWith('head') && !k.includes('overlay'));
   const headOverlayKeys = Object.keys(REGIONS).filter(k => k.startsWith('head_overlay'));
 
-  const suitBaseRegion = buildRegionMask(suitBaseKeys);
-  const suitOverlayRegion = buildRegionMask(suitOverlayKeys);
+  const jacketBaseRegion = buildRegionMask(jacketBaseKeys);
+  const jacketOverlayRegion = buildRegionMask(jacketOverlayKeys);
+  const pantsBaseRegion = buildRegionMask(pantsBaseKeys);
+  const pantsOverlayRegion = buildRegionMask(pantsOverlayKeys);
   const headRegion = buildRegionMask(headKeys);
   const headBaseRegion = buildRegionMask(headBaseKeys);
   const headOverlayRegion = buildRegionMask(headOverlayKeys);
 
-  const suitPixels = [], tiePixels = [], hairPixels = [], sparkPixels = [], crownPixels = [];
+  // Shoe region: bottom 4 pixel rows of each leg (front face)
+  // Right leg front: y=28-31 in texture. Left leg front: y=60-63
+  // We also include bottom rows across all leg faces (outer, inner, back)
+  const shoeRegion = new Uint8Array(64 * 64);
+  // Right leg base: all faces, bottom 4 rows (y=28 to 31)
+  for (const k of pantsBaseKeys) {
+    const [x1, y1, x2, y2] = REGIONS[k];
+    const h = y2 - y1; // 12 for legs
+    const shoeStart = y2 - 4; // bottom 4 pixels
+    for (let y = shoeStart; y < y2; y++)
+      for (let x = x1; x < x2; x++)
+        shoeRegion[y * 64 + x] = 1;
+  }
+  // Also mark shoe rows on leg overlays
+  for (const k of pantsOverlayKeys) {
+    const [x1, y1, x2, y2] = REGIONS[k];
+    const shoeStart = y2 - 4;
+    for (let y = shoeStart; y < y2; y++)
+      for (let x = x1; x < x2; x++)
+        shoeRegion[y * 64 + x] = 1;
+  }
+
+  const jacketPixels = [], pantsPixels = [], tiePixels = [], hairPixels = [];
+  const sparkPixels = [], crownPixels = [], maskPixels = [];
+  const shirtPixels = [], shoePixels = [], skinTonePixels = [];
 
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
@@ -909,19 +1179,53 @@ function classifyAndBuildMasks(data) {
       const isSuit = isSuitDark || isSuitLight;
       const isShirt = isGrey && brightness >= 180;
 
+      // Detect skin tone: warm-toned non-grey pixels (the peach/beige face colors)
+      const isSkinTone = notGrey && r > 150 && g > 70 && b > 10 && r > g && g > b && !isTie && !isGold;
+
       const idx = y * W + x;
-      const inSuitBase = suitBaseRegion[idx];
-      const inSuitOverlay = suitOverlayRegion[idx];
+      const inJacketBase = jacketBaseRegion[idx];
+      const inJacketOverlay = jacketOverlayRegion[idx];
+      const inPantsBase = pantsBaseRegion[idx];
+      const inPantsOverlay = pantsOverlayRegion[idx];
       const inHeadBase = headBaseRegion[idx];
       const inHeadOverlay = headOverlayRegion[idx];
+      const inShoeRegion = shoeRegion[idx];
 
       // Base value for HSV transforms
       const baseV = Math.max(r, g, b) / 255;
+      // Store full base HSV for skin tone transforms
+      const baseH_r = r/255, baseH_g = g/255, baseH_b = b/255;
 
-      if (isSuit && (inSuitBase || inSuitOverlay)) {
-        suitPixels.push({ y, x, baseV });
+      // Spark center details (the white pixels inside the cyan spark on the back overlay)
+      const isSparkCenter = isGrey && brightness > 200 && x >= 32 && x <= 40 && y >= 36 && y <= 48;
+
+      // Jacket = suit dark/light in body+arm regions
+      if (isSuit && (inJacketBase || inJacketOverlay)) {
+        jacketPixels.push({ y, x, baseV });
       }
-      if (isTie && (inSuitBase || inSuitOverlay)) {
+      // Pants = suit dark/light in leg regions (excluding shoe zone)
+      if (isSuit && (inPantsBase || inPantsOverlay) && !inShoeRegion) {
+        pantsPixels.push({ y, x, baseV });
+      }
+      // Shirt = bright grey in body+arm+leg regions (excluding shoe region)
+      // Also include head region collar pixels, but NOT the white hacker mask on the overlay front
+      const inMaskArea = inHeadOverlay && x >= 44 && x <= 47 && y >= 8 && y <= 15;
+      // Capture mask pixels separately for mask color/removal
+      if (inMaskArea && a > 0) {
+        maskPixels.push({ y, x, baseV });
+      }
+      if (isShirt && !isSparkCenter && !inMaskArea && (inJacketBase || inJacketOverlay || inPantsBase || inPantsOverlay || inHeadBase || inHeadOverlay) && !inShoeRegion) {
+        shirtPixels.push({ y, x, baseV });
+      }
+      // Shoes = bright grey in shoe region only
+      if (isShirt && inShoeRegion) {
+        shoePixels.push({ y, x, baseV });
+      }
+      // Also include suit-dark/light in shoe region as shoe pixels
+      if (isSuit && inShoeRegion) {
+        shoePixels.push({ y, x, baseV });
+      }
+      if (isTie && (inJacketBase || inJacketOverlay)) {
         tiePixels.push({ y, x, baseV });
       }
       // Bounding box for the white mask's dark eyes/features so they don't get colored as hair
@@ -931,7 +1235,12 @@ function classifyAndBuildMasks(data) {
       if (isSuit && (inHeadBase || (inHeadOverlay && !inMaskBox))) {
         hairPixels.push({ y, x, baseV });
       }
-      if ((isGold || isCyan || (isTie && inHeadOverlay)) && (inHeadOverlay || inSuitBase || inSuitOverlay)) {
+      // Skin tone pixels — on head and body
+      if (isSkinTone && (inHeadBase || inHeadOverlay || inJacketBase || inPantsBase)) {
+        const [bh, bs, bv] = rgbToHsv(baseH_r, baseH_g, baseH_b);
+        skinTonePixels.push({ y, x, baseH: bh, baseS: bs, baseV: bv });
+      }
+      if ((isGold || isCyan || isSparkCenter || (isTie && inHeadOverlay)) && (inHeadOverlay || inJacketBase || inJacketOverlay)) {
         if (inHeadOverlay) {
           crownPixels.push({ y, x, baseV });
         } else {
@@ -942,11 +1251,16 @@ function classifyAndBuildMasks(data) {
   }
 
   masks = {
-    suit: suitPixels,
+    jacket: jacketPixels,
+    pants: pantsPixels,
     tie: tiePixels,
+    shirt: shirtPixels,
+    shoes: shoePixels,
     hair: hairPixels,
+    skinTone: skinTonePixels,
     spark: sparkPixels,
-    crown: crownPixels
+    crown: crownPixels,
+    mask: maskPixels
   };
 }
 
@@ -955,22 +1269,63 @@ function applyTransforms(srcData) {
   const W = 64;
 
   // Get current options
-  const sOpt = SUIT_COLORS[currentSelection.suit];
+  const jOpt = JACKET_COLORS[currentSelection.jacket];
+  const pOpt = PANTS_COLORS[currentSelection.pants];
   const tOpt = TIE_COLORS[currentSelection.tie];
+  const shOpt = SHIRT_COLORS[currentSelection.shirt];
   const hOpt = HAIR_COLORS[currentSelection.hair];
   const eOpt = EYE_COLORS[currentSelection.eyes];
+  const stOpt = SKIN_TONE_COLORS[currentSelection.skinTone];
+  const shoOpt = SHOE_COLORS[currentSelection.shoes];
   const spOpt = SPARK_COLORS[currentSelection.spark];
   const crOpt = CROWN_COLORS[currentSelection.crown];
+  const mType = MASK_TYPES[currentSelection.maskType];
+  const mCol = MASK_COLORS[currentSelection.maskColor];
 
-  // Apply suit
-  for (const p of masks.suit) {
-    const v = Math.min(1, p.baseV * sOpt[3]);
+  // Apply jacket
+  for (const p of masks.jacket) {
+    const v = Math.min(1, p.baseV * jOpt[3]);
     const satFactor = Math.max(0, Math.min(1, 1.0 - Math.pow(p.baseV * 2.0, 4)));
-    const [r, g, b] = hsvToRgb(sOpt[1], sOpt[2] * satFactor, v);
+    const [r, g, b] = hsvToRgb(jOpt[1], jOpt[2] * satFactor, v);
     const i = (p.y * W + p.x) * 4;
     out[i] = Math.round(r * 255);
     out[i+1] = Math.round(g * 255);
     out[i+2] = Math.round(b * 255);
+  }
+
+  // Apply pants
+  for (const p of masks.pants) {
+    const v = Math.min(1, p.baseV * pOpt[3]);
+    const satFactor = Math.max(0, Math.min(1, 1.0 - Math.pow(p.baseV * 2.0, 4)));
+    const [r, g, b] = hsvToRgb(pOpt[1], pOpt[2] * satFactor, v);
+    const i = (p.y * W + p.x) * 4;
+    out[i] = Math.round(r * 255);
+    out[i+1] = Math.round(g * 255);
+    out[i+2] = Math.round(b * 255);
+  }
+
+  // Apply shirt (colorize bright greys)
+  if (currentSelection.shirt !== 0) { // 0 = white/default, skip
+    for (const p of masks.shirt) {
+      const v = Math.min(1, p.baseV * shOpt[3]);
+      const [r, g, b] = hsvToRgb(shOpt[1], shOpt[2], v);
+      const i = (p.y * W + p.x) * 4;
+      out[i] = Math.round(r * 255);
+      out[i+1] = Math.round(g * 255);
+      out[i+2] = Math.round(b * 255);
+    }
+  }
+
+  // Apply shoes
+  if (currentSelection.shoes !== 0) { // 0 = default, keep original
+    for (const p of masks.shoes) {
+      const v = Math.min(1, p.baseV * shoOpt[3]);
+      const [r, g, b] = hsvToRgb(shoOpt[1], shoOpt[2], v);
+      const i = (p.y * W + p.x) * 4;
+      out[i] = Math.round(r * 255);
+      out[i+1] = Math.round(g * 255);
+      out[i+2] = Math.round(b * 255);
+    }
   }
 
   // Apply tie (use base brightness from original)
@@ -995,39 +1350,325 @@ function applyTransforms(srcData) {
     out[i+2] = Math.round(b * 255);
   }
 
-  // Apply eyes
-  const eyeMain = eOpt[1], eyeDark = eOpt[2];
-  const eyeMainCoords = [[11,12],[13,12],[11,13],[13,13]];
-  const eyeDarkCoords = [[10,12],[14,12],[10,13],[14,13]];
-  for (const [x, y] of eyeMainCoords) {
-    const i = (y * W + x) * 4;
-    out[i] = eyeMain[0]; out[i+1] = eyeMain[1]; out[i+2] = eyeMain[2]; out[i+3] = 255;
+  // Apply skin tone (hue-shift relative to base)
+  if (currentSelection.skinTone !== 0) { // 0 = default
+    const hueShift = stOpt[1];
+    const satMult = stOpt[2];
+    const valMult = stOpt[3];
+    for (const p of masks.skinTone) {
+      const newH = ((p.baseH + hueShift) % 1 + 1) % 1;
+      const newS = Math.min(1, p.baseS * satMult);
+      const newV = Math.min(1, p.baseV * valMult);
+      const [r, g, b] = hsvToRgb(newH, newS, newV);
+      const i = (p.y * W + p.x) * 4;
+      out[i] = Math.round(r * 255);
+      out[i+1] = Math.round(g * 255);
+      out[i+2] = Math.round(b * 255);
+    }
   }
-  for (const [x, y] of eyeDarkCoords) {
+
+  // Apply eyes (base layer)
+  const eyeMain = eOpt[1]; 
+  const eyeDark = eOpt[2];
+
+  // We split the eye into a top pixel (shadow/eyelash) and bottom pixel (bright iris) to provide texture.
+  const eyeTopCoords = [[10,13],[14,13]];
+  for (const [x, y] of eyeTopCoords) {
     const i = (y * W + x) * 4;
     out[i] = eyeDark[0]; out[i+1] = eyeDark[1]; out[i+2] = eyeDark[2]; out[i+3] = 255;
   }
 
-  // Apply spark
-  for (const p of masks.spark) {
-    const origI = (p.y * W + p.x) * 4;
-    const or = srcData[origI]/255, og = srcData[origI+1]/255, ob = srcData[origI+2]/255;
-    const [oh, os, ov] = rgbToHsv(or, og, ob);
-    const [r, g, b] = hsvToRgb(spOpt[1], spOpt[2], Math.min(1.0, ov * spOpt[3]));
-    out[origI] = Math.round(r * 255);
-    out[origI+1] = Math.round(g * 255);
-    out[origI+2] = Math.round(b * 255);
+  const eyeBotCoords = [[10,14],[14,14]];
+  for (const [x, y] of eyeBotCoords) {
+    const i = (y * W + x) * 4;
+    out[i] = eyeMain[0]; out[i+1] = eyeMain[1]; out[i+2] = eyeMain[2]; out[i+3] = 255;
+  }
+  // Base layer painting covers the biological eyes perfectly as the overlay is transparent here.
+  // The hacker mask should intentionally remain untouched as it is a non-biological feature.
+
+  // Apply spark (none = hide by setting alpha to 0)
+  if (spOpt[0] === 'none_spark') {
+    for (const p of masks.spark) {
+      const i = (p.y * W + p.x) * 4;
+      out[i+3] = 0;
+    }
+  } else {
+    for (const p of masks.spark) {
+      const origI = (p.y * W + p.x) * 4;
+      const or = srcData[origI]/255, og = srcData[origI+1]/255, ob = srcData[origI+2]/255;
+      const [oh, os, ov] = rgbToHsv(or, og, ob);
+      
+      // Leave pure white spark center pixels untinted so they glow
+      if (os < 0.05 && ov > 0.95) {
+        continue;
+      }
+      
+      const [r, g, b] = hsvToRgb(spOpt[1], spOpt[2], Math.min(1.0, ov * spOpt[3]));
+      out[origI] = Math.round(r * 255);
+      out[origI+1] = Math.round(g * 255);
+      out[origI+2] = Math.round(b * 255);
+    }
   }
 
-  // Apply crown
-  for (const p of masks.crown) {
-    const origI = (p.y * W + p.x) * 4;
-    const or = srcData[origI]/255, og = srcData[origI+1]/255, ob = srcData[origI+2]/255;
-    const [oh, os, ov] = rgbToHsv(or, og, ob);
-    const [r, g, b] = hsvToRgb(crOpt[1], crOpt[2], Math.min(1.0, ov * crOpt[3]));
-    out[origI] = Math.round(r * 255);
-    out[origI+1] = Math.round(g * 255);
-    out[origI+2] = Math.round(b * 255);
+  // Apply crown (BEFORE mask so mask mirroring picks up crown state)
+  if (crOpt[0] === 'none_crown') {
+    // Hide the crown shape entirely on the head overlay
+    for (const p of masks.crown) {
+      const origI = (p.y * W + p.x) * 4;
+      out[origI+3] = 0;
+    }
+    
+    // Fill the exposed crown area with hair that blends naturally.
+    // The crown covers overlay front x=40-43 (base x=8-11), rows y=8-10.
+    // When removed, the base layer shows through — it already has hair pixels
+    // that were colored by the hair transform above. But we need to ensure
+    // the base texture in this zone matches the surrounding hair pattern.
+    //
+    // The actual hair pattern uses a checker/weave of brightness values:
+    //   Head top base: alternates 25, 30, 35, 43, 50
+    //   Head front base y=8-10: edges=30, inner=25
+    //   Head sides: uses 25, 30, 35, 43, 50
+    //
+    // We paint a hair texture on the base (x=8-11, y=8-11) that mirrors
+    // the adjacent existing hair, using the same baseV range and weave pattern.
+    // Only the LEFT 4 columns are touched (crown zone); right side is already
+    // correct (under the mask overlay).
+    
+    // Base layer hair texture for the crown zone (4 cols x 4 rows)
+    // Values chosen to match the adjacent hair: edge pixels brighter (0.118-0.169),
+    // inner pixels darker (0.098-0.137), with subtle variation for texture.
+    const baseTex = [
+      // x=8    x=9    x=10   x=11   (base coords, y=8 to y=11)
+      [0.118, 0.098, 0.098, 0.118],  // y=8:  edge-inner-inner-edge (matches existing row)
+      [0.137, 0.110, 0.098, 0.120],  // y=9:  slight variation
+      [0.118, 0.098, 0.110, 0.098],  // y=10: variation
+      [0.130, 0.105, 0.098, 0.110],  // y=11: transition row
+    ];
+    
+    for (let i = 0; i < 4; i++) {
+      const y = 8 + i;
+      for (let j = 0; j < 4; j++) {
+        const x = 8 + j; // Only left 4 columns (crown zone)
+        const fakeBaseV = baseTex[i][j];
+        
+        const v = Math.min(1, fakeBaseV * hOpt[3]);
+        const satFactor = Math.max(0, Math.min(1, 1.0 - Math.pow(fakeBaseV * 2.0, 4)));
+        const [r, g, b] = hsvToRgb(hOpt[1], hOpt[2] * satFactor, v);
+        
+        const idx = (y * W + x) * 4;
+        out[idx] = Math.round(r * 255);
+        out[idx+1] = Math.round(g * 255);
+        out[idx+2] = Math.round(b * 255);
+        out[idx+3] = 255;
+      }
+    }
+    
+    // Also paint matching hair on the OVERLAY layer for the crown zone
+    // to add the depth detail that the overlay provides everywhere else.
+    // Existing overlay hair: y=11 has (43,32,35), y=12 has (30,35,20,35).
+    // We extend this texture upward into the crown rows (y=8-10) on the overlay,
+    // using a sparse pattern (some pixels transparent) for a natural look.
+    // overlay x = base x + 32, so x=40-43
+    const overlayTex = [
+      // x=40   x=41   x=42   x=43      (overlay coords)
+      // Values: 0 = transparent, >0 = hair brightness
+      [0,      0.137, 0,      0.120],   // y=8: sparse detail
+      [0.110,  0,      0.130, 0],        // y=9: alternating
+      [0,      0.120, 0,      0.110],   // y=10: sparse detail
+    ];
+    
+    for (let i = 0; i < 3; i++) {
+      const y = 8 + i;
+      for (let j = 0; j < 4; j++) {
+        const x = 40 + j; // Overlay front X
+        const fakeBaseV = overlayTex[i][j];
+        
+        if (fakeBaseV === 0) continue; // Leave transparent
+        
+        const v = Math.min(1, fakeBaseV * hOpt[3]);
+        const satFactor = Math.max(0, Math.min(1, 1.0 - Math.pow(fakeBaseV * 2.0, 4)));
+        const [r, g, b] = hsvToRgb(hOpt[1], hOpt[2] * satFactor, v);
+        
+        const idx = (y * W + x) * 4;
+        out[idx] = Math.round(r * 255);
+        out[idx+1] = Math.round(g * 255);
+        out[idx+2] = Math.round(b * 255);
+        out[idx+3] = 255;
+      }
+    }
+  } else {
+    for (const p of masks.crown) {
+      const origI = (p.y * W + p.x) * 4;
+      const or = srcData[origI]/255, og = srcData[origI+1]/255, ob = srcData[origI+2]/255;
+      const [oh, os, ov] = rgbToHsv(or, og, ob);
+      const [r, g, b] = hsvToRgb(crOpt[1], crOpt[2], Math.min(1.0, ov * crOpt[3]));
+      out[origI] = Math.round(r * 255);
+      out[origI+1] = Math.round(g * 255);
+      out[origI+2] = Math.round(b * 255);
+    }
+  }
+
+  // Apply mask (AFTER crown so mirroring picks up the crown's final state)
+  if (mType[0] === 'none_mask') {
+    // Remove the mask entirely by setting overlay mask pixels to transparent
+    for (const p of masks.mask) {
+      const origI = (p.y * W + p.x) * 4;
+      out[origI+3] = 0;
+    }
+    
+    // Mirror the LEFT side of the base face to the RIGHT side to fill in.
+    // Base face front: x=8-15, y=8-15. Left half = x=8-11, Right half = x=12-15.
+    for (let y = 8; y < 16; y++) {
+      for (let j = 0; j < 4; j++) {
+        const srcX = 8 + j;
+        const dstX = 15 - j;
+        const srcI = (y * W + srcX) * 4;
+        const dstI = (y * W + dstX) * 4;
+        out[dstI]   = out[srcI];
+        out[dstI+1] = out[srcI+1];
+        out[dstI+2] = out[srcI+2];
+        out[dstI+3] = out[srcI+3];
+      }
+    }
+    
+    // Mirror the left-side overlay front to the right-side (where the mask was).
+    // Preserves the crown shape (transparent gaps stay transparent).
+    // overlay front: x=40-43 (left) -> x=44-47 (right, mirrored)
+    for (let y = 8; y < 16; y++) {
+      for (let j = 0; j < 4; j++) {
+        const srcX = 40 + j;
+        const dstX = 47 - j;
+        const srcI = (y * W + srcX) * 4;
+        const dstI = (y * W + dstX) * 4;
+        out[dstI]   = out[srcI];
+        out[dstI+1] = out[srcI+1];
+        out[dstI+2] = out[srcI+2];
+        out[dstI+3] = out[srcI+3];
+      }
+    }
+  } else if (mType[0] === 'hacker_mask') {
+    // Modify existing Hacker Mask
+    const isSpecialColor = mCol[0] !== 'white' && mCol[0] !== 'black';
+    if (mCol[0] !== 'white') {
+      for (const p of masks.mask) {
+        const origI = (p.y * W + p.x) * 4;
+        const origBaseV = p.baseV;
+        let newV = mCol[3];
+        // Keep shadows/highlights
+        if (origBaseV < 0.9) newV = origBaseV * (isSpecialColor ? 0.8 : 0.6);
+        const [r, g, b] = hsvToRgb(mCol[1], mCol[2], newV);
+        out[origI]   = Math.round(r * 255);
+        out[origI+1] = Math.round(g * 255);
+        out[origI+2] = Math.round(b * 255);
+      }
+    }
+  } else if (mType[0] === 'shadow_mask') {
+    // Apply Shadow Mask
+    const isSpecialColor = mCol[0] !== 'black' && mCol[0] !== 'white';
+    
+    // 1. Paint the BASE layer right half of the front face (x=12-15) dark.
+    const baseFrontRight = [
+      [  0,  0,  0,  0], [  0,  0,  0, 11], [  0,  0, 11, 31], [  2, 11, 31, 11],
+      [  2, 31, 31,  0], [  0,  2,  0, 47], [ 47, 47, 47, 47], [ 47, 47, 47,  0],
+    ];
+    for (let i = 0; i < 8; i++) {
+      const y = 8 + i;
+      for (let j = 0; j < 4; j++) {
+        const x = 12 + j;
+        const bv = baseFrontRight[i][j];
+        const idx = (y * W + x) * 4;
+        let pixelV = bv / 255;
+        if (pixelV === 0 && isSpecialColor) pixelV = 0.05;
+        // Default shadow is dark, so scale V by the selected color's brightness. 
+        // We use 0.5 to keep it relatively dark even when picking bright colors.
+        const adjustedV = Math.min(1.0, pixelV * Math.max(0.5, mCol[3]));
+        const [tr, tg, tb] = hsvToRgb(mCol[1], mCol[2], adjustedV);
+        out[idx]   = Math.round(tr * 255);
+        out[idx+1] = Math.round(tg * 255);
+        out[idx+2] = Math.round(tb * 255);
+      }
+    }
+
+    // 2. Hide white hacker mask where shadow mask applies
+    for (const p of masks.mask) {
+      if (p.x >= 44 && p.x <= 47) {
+        const origI = (p.y * W + p.x) * 4;
+        out[origI+3] = 0;
+      }
+    }
+
+    // 3. Paint the overlay shadow detail pixels (filtered to front overlay left half)
+    for (const [sx, sy, bv] of SHADOW_MASK_PIXELS.filter(p => p[0] >= 44 && p[0] <= 47)) {
+      const idx = (sy * W + sx) * 4;
+      let pixelV = bv / 255;
+      if (pixelV === 0 && isSpecialColor) pixelV = 0.05;
+      const adjustedV = Math.min(1.0, pixelV * Math.max(0.5, mCol[3]));
+      const [tr, tg, tb] = hsvToRgb(mCol[1], mCol[2], adjustedV);
+      out[idx]   = Math.round(tr * 255);
+      out[idx+1] = Math.round(tg * 255);
+      out[idx+2] = Math.round(tb * 255);
+      out[idx+3] = 255;
+    }
+  } else if (mType[0] === 'enderman_mask') {
+    // Apply Enderman Mask (Exact Paste from source image)
+    const isSpecialColor = mCol[0] !== 'black' && mCol[0] !== 'white';
+
+    // 1. Completely hide the original Hacker mask overlay so it doesn't conflict
+    for (const p of masks.mask) {
+      const origI = (p.y * W + p.x) * 4;
+      out[origI+3] = 0;
+    }
+
+    // 2. Mirror biological skin on base layer just in case there are gaps
+    for (let y = 8; y < 16; y++) {
+      for (let j = 0; j < 4; j++) {
+        const srcX = 8 + j;
+        const dstX = 15 - j;
+        const srcI = (y * W + srcX) * 4;
+        const dstI = (y * W + dstX) * 4;
+        out[dstI]   = out[srcI];
+        out[dstI+1] = out[srcI+1];
+        out[dstI+2] = out[srcI+2];
+        out[dstI+3] = out[srcI+3];
+      }
+    }
+
+    // 3. Paint exact extracted pixels from source image
+    const paintExact = (xStart, yStart, matrix) => {
+      for (let y = 0; y < matrix.length; y++) {
+        for (let x = 0; x < matrix[y].length; x++) {
+          const c = matrix[y][x];
+          if (c[0] === -1) continue; // transparent overlay pixel
+          
+          let outI = ((yStart + y) * W + (xStart + x)) * 4;
+          let r = c[0], g = c[1], b = c[2];
+          
+          if (isSpecialColor) {
+             const [oh, os, ov] = rgbToHsv(r/255, g/255, b/255);
+             const isEye = r > 150 && b > 150;
+             if (!isEye) { // Tint dark parts
+                 const newV = Math.min(1.0, ov * (mCol[3] / 0.2));
+                 const [tr, tg, tb] = hsvToRgb(mCol[1], mCol[2], newV);
+                 r = tr*255; g = tg*255; b = tb*255;
+             }
+          }
+          
+          out[outI] = Math.round(r); 
+          out[outI+1] = Math.round(g); 
+          out[outI+2] = Math.round(b); 
+          out[outI+3] = 255;
+        }
+      }
+    };
+
+    paintExact(12, 8, ENDER_FRONT_B);
+    paintExact(44, 8, ENDER_FRONT_O);
+    paintExact(16, 8, ENDER_LEFT_B);
+    paintExact(48, 8, ENDER_LEFT_O);
+    paintExact(12, 0, ENDER_TOP_B);
+    paintExact(44, 0, ENDER_TOP_O);
+    paintExact(24, 8, ENDER_BACK_B);
+    paintExact(56, 8, ENDER_BACK_O);
   }
 
   return out;
@@ -1300,14 +1941,26 @@ function updatePreview() {
   updateSkinName();
 }
 
+function getSkinNameParts() {
+  return {
+    j: JACKET_COLORS[currentSelection.jacket][0],
+    p: PANTS_COLORS[currentSelection.pants][0],
+    t: TIE_COLORS[currentSelection.tie][0],
+    sh: SHIRT_COLORS[currentSelection.shirt][0],
+    h: HAIR_COLORS[currentSelection.hair][0],
+    e: EYE_COLORS[currentSelection.eyes][0],
+    st: SKIN_TONE_COLORS[currentSelection.skinTone][0],
+    sho: SHOE_COLORS[currentSelection.shoes][0],
+    sp: SPARK_COLORS[currentSelection.spark][0],
+    cr: CROWN_COLORS[currentSelection.crown][0],
+    mt: MASK_TYPES[currentSelection.maskType][0],
+    mc: MASK_COLORS[currentSelection.maskColor][0],
+  };
+}
+
 function updateSkinName() {
-  const s = SUIT_COLORS[currentSelection.suit][0];
-  const t = TIE_COLORS[currentSelection.tie][0];
-  const h = HAIR_COLORS[currentSelection.hair][0];
-  const e = EYE_COLORS[currentSelection.eyes][0];
-  const sp = SPARK_COLORS[currentSelection.spark][0];
-  const cr = CROWN_COLORS[currentSelection.crown][0];
-  document.getElementById('skinName').innerHTML = `<span class="skin-name-prefix">&gt;</span> ${s}-${t}-${h}-${e}-${sp}-${cr}-skin.png`;
+  const n = getSkinNameParts();
+  document.getElementById('skinName').innerHTML = `<span class="skin-name-prefix">&gt;</span> ${n.j}-${n.p}-${n.t}-${n.h}-${n.e}-skin.png`;
 }
 
 // ══════════════════════════════════════════════
@@ -1319,14 +1972,29 @@ function prettyName(rawName) {
 }
 
 function makeSwatchColor(type, opt) {
-  if (type === 'suit') {
+  if (type === 'jacket' || type === 'pants') {
     const v = Math.min(0.65, 0.22 * opt[3]);
     const [r, g, b] = hsvToRgb(opt[1], opt[2] * 0.85, v);
     return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
   }
-  if (type === 'tie' || type === 'spark' || type === 'crown') {
+  if (type === 'tie' || type === 'spark' || type === 'crown' || type === 'maskType' || type === 'maskColor') {
+    if (opt[0].includes('shadow') || opt[0].includes('enderman')) return 'linear-gradient(135deg, #111 0%, #333 40%, #111 100%)';
+    if (opt[0].includes('hacker')) return 'linear-gradient(135deg, #ddd 0%, #fff 40%, #ddd 100%)';
+    if (opt[0].startsWith('none')) return 'repeating-linear-gradient(45deg,#333,#333 3px,#555 3px,#555 6px)';
     const v = Math.min(0.9, 0.72 * opt[3]);
     const [r, g, b] = hsvToRgb(opt[1], Math.max(opt[2], 0.15), v);
+    return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
+  }
+  if (type === 'shirt') {
+    if (opt[0] === 'white_shirt') return '#e8e8e8';
+    const v = Math.min(0.9, 0.8 * opt[3]);
+    const [r, g, b] = hsvToRgb(opt[1], Math.max(opt[2], 0.1), v);
+    return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
+  }
+  if (type === 'shoes') {
+    if (opt[0] === 'default_shoes') return '#c8c8c8';
+    const v = Math.min(0.8, 0.7 * opt[3] + 0.1);
+    const [r, g, b] = hsvToRgb(opt[1], Math.max(opt[2], 0.1), v);
     return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
   }
   if (type === 'hair') {
@@ -1334,79 +2002,211 @@ function makeSwatchColor(type, opt) {
     const [r, g, b] = hsvToRgb(opt[1], opt[2] * 0.85, v);
     return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
   }
+  if (type === 'skinTone') {
+    // Show a representative skin color swatch
+    const baseH = 0.06, baseS = 0.34, baseV_val = 0.82; // approximate original skin HSV
+    const h = ((baseH + opt[1]) % 1 + 1) % 1;
+    const s = Math.min(1, baseS * opt[2]);
+    const v = Math.min(1, baseV_val * opt[3]);
+    const [r, g, b] = hsvToRgb(h, s, v);
+    return `rgb(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)})`;
+  }
   return '#888';
 }
 
 const OPTION_GROUPS = [
-  { key: 'suit',   title: 'Suit Color',   icon: '🧥', bg: 'rgba(79,140,255,0.12)',  data: SUIT_COLORS },
-  { key: 'tie',    title: 'Tie Color',    icon: '👔', bg: 'rgba(239,68,68,0.12)',   data: TIE_COLORS },
-  { key: 'hair',   title: 'Hair Color',   icon: '💇', bg: 'rgba(234,179,8,0.12)',   data: HAIR_COLORS },
-  { key: 'eyes',   title: 'Eye Color',    icon: '👁', bg: 'rgba(16,185,129,0.12)',  data: EYE_COLORS },
-  { key: 'spark',  title: 'Spark Color',  icon: '⚡', bg: 'rgba(168,85,247,0.12)',  data: SPARK_COLORS },
-  { key: 'crown',  title: 'Crown Color',  icon: '👑', bg: 'rgba(244,63,94,0.12)',   data: CROWN_COLORS },
+  { key: 'jacket',   title: 'Jacket Color',   icon: '🧥', data: JACKET_COLORS },
+  { key: 'pants',    title: 'Pants Color',    icon: '👖', data: PANTS_COLORS },
+  { key: 'tie',      title: 'Tie Color',      icon: '👔', data: TIE_COLORS },
+  { key: 'shirt',    title: 'Shirt Color',    icon: '👕', data: SHIRT_COLORS },
+  { key: 'hair',     title: 'Hair Color',     icon: '💇', data: HAIR_COLORS },
+  { key: 'eyes',     title: 'Eye Color',      icon: '👁', data: EYE_COLORS },
+  { key: 'skinTone', title: 'Skin Tone',      icon: '🎨', data: SKIN_TONE_COLORS },
+  { key: 'shoes',    title: 'Shoe Color',     icon: '👞', data: SHOE_COLORS },
+  { key: 'spark',    title: 'Spark Color',    icon: '⚡', data: SPARK_COLORS },
+  { key: 'crown',    title: 'Crown Color',    icon: '👑', data: CROWN_COLORS },
+  { 
+    key: 'mask', title: 'Mask Options', icon: '🎭', 
+    sections: [
+      { title: 'Mask Type', key: 'maskType', data: MASK_TYPES },
+      { title: 'Mask Color', key: 'maskColor', data: MASK_COLORS }
+    ]
+  },
 ];
+
+let activeTab = 'jacket';
+
+function switchTab(key) {
+  activeTab = key;
+  document.querySelectorAll('.tab-btn').forEach(t => t.classList.toggle('active', t.dataset.key === key));
+  document.querySelectorAll('.swatch-panel').forEach(p => p.classList.toggle('active', p.dataset.key === key));
+}
+
+function updateSelectedLabel(itemKey) {
+  let itemGroup = null;
+  let itemOpt = null;
+  for (const group of OPTION_GROUPS) {
+    if (group.key === itemKey) {
+      itemGroup = group;
+      itemOpt = group.data[currentSelection[itemKey]];
+      break;
+    } else if (group.sections) {
+      for (const sec of group.sections) {
+        if (sec.key === itemKey) {
+          itemGroup = sec;
+          itemOpt = sec.data[currentSelection[itemKey]];
+          break;
+        }
+      }
+    }
+  }
+  
+  if (!itemGroup || !itemOpt) return;
+  
+  const label = document.getElementById('selected-label-' + itemKey);
+  if (!label) return;
+  const dot = label.querySelector('.selected-label-dot');
+  const text = label.querySelector('.selected-label-text');
+  if (dot) {
+    if (itemKey === 'eyes') {
+      const main = itemOpt[1];
+      dot.style.background = `rgb(${main[0]},${main[1]},${main[2]})`;
+    } else {
+      dot.style.background = makeSwatchColor(itemKey, itemOpt);
+    }
+  }
+  if (text) text.textContent = prettyName(itemOpt[0]);
+}
 
 function buildUI() {
   const container = document.getElementById('optionsContainer');
+  const card = document.createElement('div');
+  card.className = 'options-card';
 
+  // Tab bar
+  const tabBar = document.createElement('div');
+  tabBar.className = 'tab-bar';
   for (const group of OPTION_GROUPS) {
-    const div = document.createElement('div');
-    div.className = 'option-group';
-    div.innerHTML = `
-      <div class="option-header">
-        <div class="option-icon" style="background:${group.bg}">${group.icon}</div>
-        <div class="option-title">${group.title}</div>
-        <div class="option-count">${group.data.length} options</div>
-        <div class="option-chevron">▼</div>
-      </div>
-      <div class="option-grid" id="grid-${group.key}"></div>
-    `;
-    container.appendChild(div);
-
-    // Collapsible toggle
-    const header = div.querySelector('.option-header');
-    header.addEventListener('click', (e) => {
-      if (e.target.closest('.opt-btn')) return;
-      div.classList.toggle('collapsed');
-    });
-
-    const grid = div.querySelector('.option-grid');
-
-    group.data.forEach((opt, idx) => {
-      const btn = document.createElement('button');
-      btn.className = 'opt-btn' + (idx === 0 ? ' active' : '');
-      btn.dataset.group = group.key;
-      btn.dataset.index = idx;
-
-      if (group.key === 'eyes') {
-        const main = opt[1], dark = opt[2];
-        const mainC = `rgb(${main[0]},${main[1]},${main[2]})`;
-        const darkC = `rgb(${dark[0]},${dark[1]},${dark[2]})`;
-        btn.innerHTML = `
-          <div class="opt-swatch-eye" style="--emain:${mainC};--edark:${darkC}">
-            <div style="position:absolute;left:0;top:0;width:50%;height:100%;background:${darkC}"></div>
-            <div style="position:absolute;right:0;top:0;width:50%;height:100%;background:${mainC}"></div>
-          </div>
-          <span>${prettyName(opt[0])}</span>
-        `;
-      } else {
-        const color = makeSwatchColor(group.key, opt);
-        btn.innerHTML = `
-          <div class="opt-swatch" style="background:${color}"></div>
-          <span>${prettyName(opt[0])}</span>
-        `;
-      }
-
-      btn.addEventListener('click', () => {
-        grid.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentSelection[group.key] = idx;
-        updatePreview();
-      });
-
-      grid.appendChild(btn);
-    });
+    const tab = document.createElement('button');
+    tab.className = 'tab-btn' + (group.key === activeTab ? ' active' : '');
+    tab.dataset.key = group.key;
+    tab.innerHTML = `<span>${group.icon}</span><span class="tab-tooltip">${group.title}</span>`;
+    tab.addEventListener('click', () => switchTab(group.key));
+    tabBar.appendChild(tab);
   }
+  card.appendChild(tabBar);
+
+  // Divider
+  const divider = document.createElement('div');
+  divider.className = 'tab-divider';
+  card.appendChild(divider);
+
+  // Swatch panels
+  for (const group of OPTION_GROUPS) {
+    const panel = document.createElement('div');
+    panel.className = 'swatch-panel' + (group.key === activeTab ? ' active' : '');
+    panel.dataset.key = group.key;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'panel-header';
+    const optCount = group.data ? group.data.length : group.sections.reduce((a,b)=>a+b.data.length,0);
+    header.innerHTML = `<span class="panel-title">${group.title}</span><span class="panel-count">${optCount} options</span>`;
+    panel.appendChild(header);
+
+    // Grid
+    const grid = document.createElement('div');
+    grid.className = 'swatch-grid';
+    grid.id = 'grid-' + group.key;
+
+    // Grid builder helper
+    const buildGridItems = (itemsData, itemsKey, gridElem) => {
+      itemsData.forEach((opt, idx) => {
+        const swatch = document.createElement('button');
+        swatch.className = 'swatch' + (idx === currentSelection[itemsKey] ? ' active' : '');
+        swatch.dataset.group = itemsKey;
+        swatch.dataset.index = idx;
+        swatch.dataset.name = prettyName(opt[0]);
+
+        if (itemsKey === 'eyes') {
+          const main = opt[1], dark = opt[2];
+          swatch.classList.add('swatch-eye');
+          swatch.innerHTML = `<div class="swatch-eye-half" style="background:rgb(${dark[0]},${dark[1]},${dark[2]})"></div><div class="swatch-eye-half" style="background:rgb(${main[0]},${main[1]},${main[2]})"></div>`;
+        } else {
+          const color = makeSwatchColor(itemsKey, opt);
+          swatch.style.background = color;
+        }
+
+        swatch.addEventListener('click', () => {
+          grid.querySelectorAll(`.swatch[data-group="${itemsKey}"]`).forEach(s => s.classList.remove('active'));
+          swatch.classList.add('active');
+          currentSelection[itemsKey] = idx;
+          const label = document.getElementById('selected-label-' + itemsKey);
+          if (label) {
+             const dotBg = itemsKey === 'eyes' ? `rgb(${opt[1][0]},${opt[1][1]},${opt[1][2]})` : makeSwatchColor(itemsKey, opt);
+             label.querySelector('.selected-label-dot').style.background = dotBg;
+             label.querySelector('.selected-label-text').textContent = prettyName(opt[0]);
+          }
+          updatePreview();
+        });
+
+        gridElem.appendChild(swatch);
+      });
+    };
+
+    if (group.sections) {
+      group.sections.forEach(sec => {
+        const subTitle = document.createElement('div');
+        subTitle.style.gridColumn = '1 / -1'; // forces it to span the entire row
+        subTitle.style.width = '100%';
+        subTitle.style.padding = '10px 4px 6px 4px';
+        subTitle.style.fontFamily = 'var(--font-pixel)';
+        subTitle.style.fontSize = '0.5rem';
+        subTitle.style.color = 'var(--text-secondary)';
+        subTitle.style.textTransform = 'uppercase';
+        subTitle.textContent = sec.title;
+        grid.appendChild(subTitle);
+        buildGridItems(sec.data, sec.key, grid);
+      });
+    } else {
+      buildGridItems(group.data, group.key, grid);
+    }
+
+    panel.appendChild(grid);
+
+    // Selected labels
+    if (group.sections) {
+       group.sections.forEach(sec => {
+          const selLabel = document.createElement('div');
+          selLabel.className = 'selected-label';
+          selLabel.id = 'selected-label-' + sec.key;
+          const selIdx = currentSelection[sec.key];
+          const selOpt = sec.data[selIdx];
+          const dotBg = makeSwatchColor(sec.key, selOpt);
+          selLabel.innerHTML = `<div class="selected-label-dot" style="background:${dotBg}"></div> Selected: <span class="selected-label-text">${prettyName(selOpt[0])}</span>`;
+          panel.appendChild(selLabel);
+       });
+    } else {
+      const selLabel = document.createElement('div');
+      selLabel.className = 'selected-label';
+      selLabel.id = 'selected-label-' + group.key;
+      const selIdx = currentSelection[group.key];
+      const selOpt = group.data[selIdx];
+      let dotBg;
+      if (group.key === 'eyes') {
+        const main = selOpt[1];
+        dotBg = `rgb(${main[0]},${main[1]},${main[2]})`;
+      } else {
+        dotBg = makeSwatchColor(group.key, selOpt);
+      }
+      selLabel.innerHTML = `<div class="selected-label-dot" style="background:${dotBg}"></div> Selected: <span class="selected-label-text">${prettyName(selOpt[0])}</span>`;
+      panel.appendChild(selLabel);
+    }
+
+    card.appendChild(panel);
+  }
+
+  container.appendChild(card);
 }
 
 // ══════════════════════════════════════════════
@@ -1423,13 +2223,8 @@ function downloadSkin() {
   ctx.putImageData(imgData, 0, 0);
 
   const link = document.createElement('a');
-  const s = SUIT_COLORS[currentSelection.suit][0];
-  const t = TIE_COLORS[currentSelection.tie][0];
-  const h = HAIR_COLORS[currentSelection.hair][0];
-  const e = EYE_COLORS[currentSelection.eyes][0];
-  const sp = SPARK_COLORS[currentSelection.spark][0];
-  const cr = CROWN_COLORS[currentSelection.crown][0];
-  link.download = `${s}-${t}-${h}-${e}-${sp}-${cr}-skin.png`;
+  const n = getSkinNameParts();
+  link.download = `${n.j}-${n.p}-${n.t}-${n.h}-${n.e}-skin.png`;
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
@@ -1722,12 +2517,25 @@ function init() {
 
   document.getElementById('downloadBtn').addEventListener('click', downloadSkin);
   document.getElementById('resetBtn').addEventListener('click', () => {
-    currentSelection = { suit: 0, tie: 0, hair: 0, eyes: 0, spark: 0, crown: 0 };
-    document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.option-grid').forEach(grid => {
-      const first = grid.querySelector('.opt-btn');
-      if (first) first.classList.add('active');
-    });
+    currentSelection = { jacket: 0, pants: 0, tie: 0, shirt: 0, hair: 0, eyes: 0, skinTone: 0, shoes: 0, spark: 5, crown: 1, maskType: 1, maskColor: 0 };
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    
+    // For each selection group/section, apply the default selection visually
+    for (const group of OPTION_GROUPS) {
+      if (group.sections) {
+        for (const sec of group.sections) {
+          const idx = currentSelection[sec.key];
+          const activeSwatch = document.querySelector(`.swatch[data-group="${sec.key}"][data-index="${idx}"]`);
+          if (activeSwatch) activeSwatch.classList.add('active');
+          updateSelectedLabel(sec.key);
+        }
+      } else {
+        const idx = currentSelection[group.key];
+        const activeSwatch = document.querySelector(`.swatch[data-group="${group.key}"][data-index="${idx}"]`);
+        if (activeSwatch) activeSwatch.classList.add('active');
+        updateSelectedLabel(group.key);
+      }
+    }
     updatePreview();
   });
 }
