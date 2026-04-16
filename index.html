@@ -1960,7 +1960,7 @@ function getSkinNameParts() {
 
 function updateSkinName() {
   const n = getSkinNameParts();
-  document.getElementById('skinName').innerHTML = `<span class="skin-name-prefix">&gt;</span> ${n.j}-${n.p}-${n.t}-${n.h}-${n.e}-skin.png`;
+  document.getElementById('skinName').innerHTML = `<span class="skin-name-prefix">&gt;</span> ${n.j}-${n.p}-${n.t}-${n.sh}-${n.h}-${n.e}-${n.st}-${n.sho}-${n.sp}-${n.cr}-${n.mt}-${n.mc}-skin.png`;
 }
 
 // ══════════════════════════════════════════════
@@ -2224,7 +2224,7 @@ function downloadSkin() {
 
   const link = document.createElement('a');
   const n = getSkinNameParts();
-  link.download = `${n.j}-${n.p}-${n.t}-${n.h}-${n.e}-skin.png`;
+  link.download = `${n.j}-${n.p}-${n.t}-${n.sh}-${n.h}-${n.e}-${n.st}-${n.sho}-${n.sp}-${n.cr}-${n.mt}-${n.mc}-skin.png`;
   link.href = canvas.toDataURL('image/png');
   link.click();
 }
